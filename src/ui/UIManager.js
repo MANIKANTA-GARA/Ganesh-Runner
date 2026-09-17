@@ -7,17 +7,12 @@ export class UIManager {
     this.game = null;
 
     this.screens = {
-      nameEntry: document.getElementById('name-entry-screen'),
-      cinematic: document.getElementById('cinematic-screen'),
-      mainMenu: document.getElementById('main-menu-screen'),
+      startScreen: document.getElementById('start-screen'),
       hud: document.getElementById('hud-screen'),
       pauseMenu: document.getElementById('pause-screen'),
       gameOver: document.getElementById('game-over-screen'),
-      leaderboard: document.getElementById('leaderboard-modal'),
       characters: document.getElementById('characters-modal'),
-      powerups: document.getElementById('powerups-modal'),
       settings: document.getElementById('settings-modal'),
-      howToPlay: document.getElementById('how-to-play-modal'),
       calibrate: document.getElementById('calibrate-modal')
     };
 
@@ -72,59 +67,31 @@ export class UIManager {
   }
 
   bindEvents() {
-    // 1. Name Entry
-    const nameInput = document.getElementById('player-name-input');
-    const continueBtn = document.getElementById('name-continue-btn');
-    const errorMsg = document.getElementById('name-error-msg');
-
-    const handleNameSubmit = () => {
-      const name = (nameInput.value || '').trim();
-      if (name.length === 0) {
-        errorMsg.classList.remove('hidden');
-        nameInput.focus();
-        return;
+    // 1. Direct Start Screen Tap / Click (Subway Surfers instant play)
+    const startTapBtn = document.getElementById('start-tap-button');
+    const startScreen = document.getElementById('start-screen');
+    const triggerStart = () => {
+      if (this.screens.startScreen && !this.screens.startScreen.classList.contains('hidden')) {
+        this.screens.startScreen.classList.add('hidden');
+        this.game?.startRun();
       }
-      errorMsg.classList.add('hidden');
-      this.game.score.setPlayerName(name);
-      this.showCinematicIntro(name);
     };
 
-    continueBtn?.addEventListener('click', handleNameSubmit);
-    nameInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleNameSubmit();
+    startTapBtn?.addEventListener('click', triggerStart);
+    startScreen?.addEventListener('click', (e) => {
+      if (!e.target.closest('button')) {
+        triggerStart();
+      }
     });
 
-    // 2. Cinematic Screen Start Run
-    document.getElementById('cinematic-start-btn')?.addEventListener('click', () => {
-      this.screens.cinematic.classList.add('hidden');
-      this.showMainMenu();
+    document.getElementById('menu-characters-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.screens.characters?.classList.remove('hidden');
     });
 
-    // 3. Main Menu Buttons
-    document.getElementById('menu-play-btn')?.addEventListener('click', () => {
-      this.screens.mainMenu.classList.add('hidden');
-      this.game.startRun();
-    });
-
-    document.getElementById('menu-characters-btn')?.addEventListener('click', () => {
-      this.screens.characters.classList.remove('hidden');
-    });
-
-    document.getElementById('menu-powerups-btn')?.addEventListener('click', () => {
-      this.screens.powerups.classList.remove('hidden');
-    });
-
-    document.getElementById('menu-leaderboard-btn')?.addEventListener('click', () => {
-      this.renderLeaderboard();
-      this.screens.leaderboard.classList.remove('hidden');
-    });
-
-    document.getElementById('menu-howtoplay-btn')?.addEventListener('click', () => {
-      this.screens.howToPlay.classList.remove('hidden');
-    });
-
-    document.getElementById('menu-settings-btn')?.addEventListener('click', () => {
-      this.screens.settings.classList.remove('hidden');
+    document.getElementById('menu-settings-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.screens.settings?.classList.remove('hidden');
     });
 
     // Modal Close Buttons
@@ -233,46 +200,26 @@ export class UIManager {
       this.showMainMenu();
     });
 
-    // Mobile touch accessibility buttons
-    document.getElementById('touch-left-btn')?.addEventListener('click', () => this.game.handleMoveLeft());
-    document.getElementById('touch-right-btn')?.addEventListener('click', () => this.game.handleMoveRight());
-    document.getElementById('touch-jump-btn')?.addEventListener('click', () => this.game.handleJump());
-    document.getElementById('touch-slide-btn')?.addEventListener('click', () => this.game.handleSlide());
   }
 
   checkInitialScreen() {
-    if (this.game.score.hasPlayerName()) {
-      this.showMainMenu();
-    } else {
-      this.screens.nameEntry.classList.remove('hidden');
-    }
+    this.showStartScreen();
   }
 
-  showCinematicIntro(playerName) {
-    this.screens.nameEntry.classList.add('hidden');
-    this.screens.cinematic.classList.remove('hidden');
+  showStartScreen() {
+    Object.values(this.screens).forEach(s => s?.classList.add('hidden'));
+    this.screens.startScreen?.classList.remove('hidden');
 
-    const welcomeEl = document.getElementById('cinematic-player-welcome');
-    if (welcomeEl) welcomeEl.textContent = `WELCOME, ${playerName.toUpperCase()}!`;
+    const highScoreBadge = document.getElementById('menu-highscore-badge');
+    if (highScoreBadge && this.game) {
+      highScoreBadge.textContent = `BEST: ${this.game.score.highScore.toLocaleString()}`;
+    }
 
-    this.game.startCinematicIntro();
+    this.game?.enterMainMenu();
   }
 
   showMainMenu() {
-    Object.values(this.screens).forEach(s => s?.classList.add('hidden'));
-    this.screens.mainMenu.classList.remove('hidden');
-
-    const nameBadge = document.getElementById('menu-player-badge');
-    if (nameBadge) {
-      nameBadge.textContent = `RUNNER: ${this.game.score.getPlayerName().toUpperCase()}`;
-    }
-
-    const highScoreBadge = document.getElementById('menu-highscore-badge');
-    if (highScoreBadge) {
-      highScoreBadge.textContent = `HIGH SCORE: ${this.game.score.highScore.toLocaleString()}`;
-    }
-
-    this.game.enterMainMenu();
+    this.showStartScreen();
   }
 
   showHUD() {
@@ -326,22 +273,7 @@ export class UIManager {
   }
 
   updateTutorialPrompt(steps) {
-    const box = this.hudElements.tutorialBox;
-    if (!box) return;
-
-    if (!steps.movedLeft || !steps.movedRight) {
-      box.textContent = '💡 SWIPE LEFT / RIGHT OR PRESS A / D TO CHANGE LANES';
-      box.classList.remove('hidden');
-    } else if (!steps.jumped) {
-      box.textContent = '💡 SWIPE UP OR PRESS W / SPACE TO JUMP OVER BARRICADES';
-      box.classList.remove('hidden');
-    } else if (!steps.slid) {
-      box.textContent = '💡 SWIPE DOWN OR PRESS S TO SLIDE UNDER TORANS';
-      box.classList.remove('hidden');
-    } else {
-      box.classList.add('hidden');
-      this.game.score.setTutorialDone();
-    }
+    // Intrusive tutorial boxes removed to keep tracks clean and unobstructed
   }
 
   updateHUD(data) {
