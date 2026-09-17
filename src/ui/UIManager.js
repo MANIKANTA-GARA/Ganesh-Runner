@@ -236,19 +236,33 @@ export class UIManager {
   }
 
   showGameOverScreen(scoreObj) {
-    this.screens.hud.classList.add('hidden');
-    this.screens.gameOver.classList.remove('hidden');
+    if (this.screens.hud) this.screens.hud.classList.add('hidden');
+    if (this.screens.gameOver) this.screens.gameOver.classList.remove('hidden');
 
-    document.getElementById('gameover-player-name').textContent = scoreObj.getPlayerName().toUpperCase();
-    document.getElementById('gameover-score').textContent = scoreObj.score.toLocaleString();
-    document.getElementById('gameover-distance').textContent = `${Math.floor(scoreObj.distance)}m`;
+    const nameEl = document.getElementById('gameover-player-name');
+    if (nameEl && typeof scoreObj?.getPlayerName === 'function') {
+      nameEl.textContent = scoreObj.getPlayerName().toUpperCase();
+    }
+
+    const scoreVal = Math.max(0, Math.round(scoreObj?.score || 0));
+    const distVal = Math.max(0, Math.floor(scoreObj?.distance || 0));
+    const laddusVal = Math.max(0, scoreObj?.laddus || scoreObj?.coins || 0);
+    const bestVal = Math.max(scoreVal, scoreObj?.highScore || 0);
+
+    const scoreEl = document.getElementById('gameover-score');
+    if (scoreEl) scoreEl.textContent = scoreVal.toLocaleString();
+
+    const distEl = document.getElementById('gameover-distance');
+    if (distEl) distEl.textContent = `${distVal}m`;
+
     const coinsEl = document.getElementById('gameover-coins');
-    if (coinsEl) coinsEl.textContent = (scoreObj.laddus || scoreObj.coins || 0).toString();
+    if (coinsEl) coinsEl.textContent = laddusVal.toString();
+
     const bestEl = document.getElementById('gameover-modaks');
-    if (bestEl) bestEl.textContent = (scoreObj.highScore || scoreObj.score || 0).toLocaleString();
+    if (bestEl) bestEl.textContent = bestVal.toLocaleString();
 
     const highBanner = document.getElementById('gameover-highscore-banner');
-    if (scoreObj.isNewHighScore) {
+    if (scoreObj?.isNewHighScore) {
       highBanner?.classList.remove('hidden');
       confetti({
         particleCount: 80,
