@@ -1,68 +1,189 @@
-﻿// InputManager.js - Mobile Gyro Tilt, Swipe Gestures, and Desktop Keyboard
+// InputManager.js - Ultra-Responsive Mobile Swipe (Subway Surfers Style), Mouse Drag & Keyboard
 export class InputManager {
   constructor() {
-    this.controlMode = 'HYBRID'; // 'TILT' | 'SWIPE' | 'HYBRID'
-    this.sensitivity = 'MEDIUM'; // 'LOW' | 'MEDIUM' | 'HIGH'
+    this.controlMode = 'SWIPE'; // Pure swipe mode is default and rock-solid
+    this.swipeThreshold = 24;   // Ultra-snappy 24px threshold for immediate reaction
 
-    // Sensitivity threshold in degrees
-    this.sensitivityThresholds = {
-      LOW: 12,
-      MEDIUM: 8,
-      HIGH: 5
-    };
-
-    // Tilt Calibration (neutral angle)
-    this.neutralGamma = 0;
-    this.neutralBeta = 45; // Typical 45 degree holding angle
-    this.currentGamma = 0;
-    this.currentBeta = 0;
-    this.hasTiltSensor = false;
-
-    // Action callbacks
+    // Callbacks
     this.onMoveLeft = null;
     this.onMoveRight = null;
     this.onJump = null;
     this.onSlide = null;
     this.onPause = null;
     this.onActivateDivine = null;
-    this.onActivateTrunk = null;
+    this.onTap = null;
+    this.onAnyInput = null;
 
-    // Tilt debounce state
-    this.tiltLaneOffset = 0; // -1, 0, +1
-    this.lastTiltTriggerTime = 0;
-
-    // Touch swipe tracking
+    // Touch tracking state
     this.touchStartX = 0;
     this.touchStartY = 0;
     this.touchStartTime = 0;
-    this.minSwipeDistance = 30; // pixels
-    this.maxSwipeTime = 600; // ms
+    this.lastTapTime = 0;
+    this.isSwiping = false;
 
-    this.initKeyboard();
+    // Mouse drag tracking (for laptop trackpad/mouse swipe)
+    this.isMouseDown = false;
+    this.mouseStartX = 0;
+    this.mouseStartY = 0;
+
+    // Tilt (optional, disabled by default)
+    this.hasTiltSensor = false;
+    this.neutralGamma = 0;
+    this.currentGamma = 0;
+    this.lastTiltTriggerTime = 0;
+
     this.initTouch();
-    this.initTilt();
+    this.initMouse();
+    this.initKeyboard();
   }
 
-  // --- Keyboard (Desktop) ---
+  // --- Mobile Touch Swipes (Subway Surfers Style) ---
+  initTouch() {
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 0) return;
+      const t = e.touches[0];
+      this.touchStartX = t.clientX;
+      this.touchStartY = t.clientY;
+      this.touchStartTime = performance.now();
+      this.isSwiping = true;
+
+      this.onAnyInput?.();
+    };
+
+    const handleTouchMove = (e) => {
+      if (!this.isSwiping || e.touches.length === 0) return;
+      // Prevent browser default pull-to-refresh and pinch-zoom behaviors
+      if (e.cancelable) e.preventDefault();
+
+      const t = e.touches[0];
+      const dx = t.clientX - this.touchStartX;
+      const dy = t.clientY - this.touchStartY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      // Trigger action as soon as the finger crosses the swipe threshold in mid-air!
+      if (Math.max(absX, absY) >= this.swipeThreshold) {
+        if (absX > absY) {
+          // Horizontal swipe
+          if (dx > 0) {
+            this.onMoveRight?.();
+          } else {
+            this.onMoveLeft?.();
+          }
+        } else {
+          // Vertical swipe
+          if (dy < 0) {
+            this.onJump?.();
+          } else {
+            this.onSlide?.();
+          }
+        }
+
+        // RESET ANCHOR POINT: Allows immediate further chained gestures
+        // (e.g. swipe right then immediately swipe up to jump without lifting finger!)
+        this.touchStartX = t.clientX;
+        this.touchStartY = t.clientY;
+      }
+    };
+
+    const handleTouchEnd = (e) => {
+      const now = performance.now();
+      const dt = now - this.touchStartTime;
+
+      if (e.changedTouches.length > 0) {
+        const t = e.changedTouches[0];
+        const dist = Math.hypot(t.clientX - this.touchStartX, t.clientY - this.touchStartY);
+
+        // Quick clean tap detection
+        if (dt < 280 && dist < 18) {
+          if (now - this.lastTapTime < 320) {
+            // Double Tap -> Activate Divine Mode
+            this.onActivateDivine?.();
+            this.lastTapTime = 0;
+          } else {
+            this.lastTapTime = now;
+            this.onTap?.();
+          }
+        }
+      }
+
+      this.isSwiping = false;
+    };
+
+    // Attach to window and canvas with passive: false to enable preventDefault
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', () => { this.isSwiping = false; }, { passive: true });
+  }
+
+  // --- Mouse Drag / Swipe (for Laptop users with trackpad/mouse) ---
+  initMouse() {
+    window.addEventListener('mousedown', (e) => {
+      // Don't intercept clicks on interactive buttons
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'INPUT') {
+        return;
+      }
+
+      this.isMouseDown = true;
+      this.mouseStartX = e.clientX;
+      this.mouseStartY = e.clientY;
+      this.onAnyInput?.();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!this.isMouseDown) return;
+
+      const dx = e.clientX - this.mouseStartX;
+      const dy = e.clientY - this.mouseStartY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      if (Math.max(absX, absY) >= this.swipeThreshold + 4) {
+        if (absX > absY) {
+          if (dx > 0) this.onMoveRight?.();
+          else this.onMoveLeft?.();
+        } else {
+          if (dy < 0) this.onJump?.();
+          else this.onSlide?.();
+        }
+        this.mouseStartX = e.clientX;
+        this.mouseStartY = e.clientY;
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      this.isMouseDown = false;
+    });
+  }
+
+  // --- Keyboard (Desktop / Laptop) ---
   initKeyboard() {
     window.addEventListener('keydown', (e) => {
-      // Avoid reacting if user is typing in an input field (e.g. Name entry)
       if (e.target.tagName === 'INPUT') return;
+
+      this.onAnyInput?.();
 
       switch (e.code) {
         case 'KeyA':
         case 'ArrowLeft':
+          e.preventDefault();
           this.onMoveLeft?.();
           break;
         case 'KeyD':
         case 'ArrowRight':
+          e.preventDefault();
           this.onMoveRight?.();
           break;
         case 'KeyW':
         case 'ArrowUp':
+          e.preventDefault();
+          this.onJump?.();
+          break;
         case 'Space':
           e.preventDefault();
           this.onJump?.();
+          this.onActivateDivine?.();
           break;
         case 'KeyS':
         case 'ArrowDown':
@@ -77,120 +198,17 @@ export class InputManager {
         case 'KeyF':
           this.onActivateDivine?.();
           break;
-        case 'KeyQ':
-        case 'Digit1':
-          this.onActivateTrunk?.();
-          break;
       }
     });
   }
 
-  // --- Touch Swipe (Mobile) ---
-  initTouch() {
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        this.touchStartX = e.touches[0].clientX;
-        this.touchStartY = e.touches[0].clientY;
-        this.touchStartTime = performance.now();
-      }
-    }, { passive: true });
-
-    window.addEventListener('touchend', (e) => {
-      if (e.changedTouches.length === 0) return;
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const dx = endX - this.touchStartX;
-      const dy = endY - this.touchStartY;
-      const dt = performance.now() - this.touchStartTime;
-
-      if (dt > this.maxSwipeTime) return;
-
-      const absX = Math.abs(dx);
-      const absY = Math.abs(dy);
-
-      if (Math.max(absX, absY) < this.minSwipeDistance) {
-        // Tap -> Divine mode activation if available
-        this.onActivateDivine?.();
-        return;
-      }
-
-      if (absX > absY) {
-        // Horizontal swipe
-        if (dx > 0) {
-          this.onMoveRight?.();
-        } else {
-          this.onMoveLeft?.();
-        }
-      } else {
-        // Vertical swipe
-        if (dy < 0) {
-          this.onJump?.();
-        } else {
-          this.onSlide?.();
-        }
-      }
-    }, { passive: true });
-  }
-
-  // --- Mobile Tilt / Gyroscope ---
-  initTilt() {
-    // Request permission for iOS 13+ devices if needed
-    const handleOrientation = (e) => {
-      if (e.gamma !== null && e.gamma !== undefined) {
-        this.hasTiltSensor = true;
-        this.currentGamma = e.gamma;
-        this.currentBeta = e.beta || 0;
-        this.processTilt();
-      }
-    };
-
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation, true);
-    }
-  }
-
-  requestTiltPermission() {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      return DeviceOrientationEvent.requestPermission()
-        .then(response => response === 'granted')
-        .catch(() => false);
-    }
-    return Promise.resolve(true);
-  }
-
-  calibratePhone() {
-    this.neutralGamma = this.currentGamma;
-    this.neutralBeta = this.currentBeta;
-    return { gamma: this.neutralGamma, beta: this.neutralBeta };
-  }
-
-  processTilt() {
-    if (this.controlMode === 'SWIPE') return; // Tilt disabled in pure swipe mode
-
-    const now = performance.now();
-    if (now - this.lastTiltTriggerTime < 240) return; // Prevent rapid flipping
-
-    const threshold = this.sensitivityThresholds[this.sensitivity] || 8;
-    const diffGamma = this.currentGamma - this.neutralGamma;
-
-    if (diffGamma < -threshold) {
-      // Tilted Left
-      this.onMoveLeft?.();
-      this.lastTiltTriggerTime = now;
-    } else if (diffGamma > threshold) {
-      // Tilted Right
-      this.onMoveRight?.();
-      this.lastTiltTriggerTime = now;
-    }
+  setControlMode(mode) {
+    this.controlMode = mode;
   }
 
   setSensitivity(level) {
-    if (this.sensitivityThresholds[level]) {
-      this.sensitivity = level;
-    }
-  }
-
-  setControlMode(mode) {
-    this.controlMode = mode;
+    if (level === 'HIGH') this.swipeThreshold = 18;
+    else if (level === 'LOW') this.swipeThreshold = 32;
+    else this.swipeThreshold = 24;
   }
 }
