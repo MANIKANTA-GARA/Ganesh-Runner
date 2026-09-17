@@ -13,59 +13,44 @@
   <!-- UI Layer Overlays -->
   <div id="ui-layer">
 
-    <!-- 1. Name Entry Screen -->
-    <div id="name-entry-screen" class="ui-screen hidden">
-      <div class="glass-panel">
-        <h1 class="title-gold">GANESH RUN</h1>
-        <p class="subtitle-divine">The Divine Run</p>
-        <div style="margin: 24px 0 6px 0;">
-          <h2 style="font-size: 1.3rem; color: #fff; margin-bottom: 6px;">Welcome, Runner!</h2>
-          <p style="font-size: 0.95rem; color: #d1c7bd;">Enter your name to begin your divine journey.</p>
-        </div>
-        <input id="player-name-input" class="input-field" type="text" maxlength="15" placeholder="ENTER YOUR NAME" autocomplete="off" autocorrect="off">
-        <p id="name-error-msg" class="hidden" style="color: #ff4d4d; font-size: 0.85rem; margin-bottom: 12px;">Please enter your name to continue.</p>
-        <button id="name-continue-btn" class="btn-gold">CONTINUE →</button>
-      </div>
-    </div>
-
-    <!-- 2. Cinematic Intro Screen -->
-    <div id="cinematic-screen" class="ui-screen hidden">
-      <div class="glass-panel" style="background: rgba(14, 10, 20, 0.75);">
-        <p class="subtitle-divine" style="letter-spacing: 5px;">THE GREAT LADDU CHASE</p>
-        <h1 id="cinematic-player-welcome" class="title-gold" style="font-size: 1.8rem; margin: 12px 0;">WELCOME, RUNNER!</h1>
-        <p style="font-size: 0.95rem; line-height: 1.5; color: #ffd7a8; margin-bottom: 24px;">
-          Little Lord Ganesha has taken the sacred golden Laddus! Now his loving father <strong>Lord Shiva</strong> is playfully chasing him through the bustling festival streets. Dodge oncoming Auto-Rickshaws, collect sweet Laddus, and run!
-        </p>
-        <p style="font-size: 1.1rem; font-weight: 800; color: #ffd700; margin-bottom: 20px; letter-spacing: 1px;">YOUR JOURNEY BEGINS NOW</p>
-        <button id="cinematic-start-btn" class="btn-gold">▶ START RUN</button>
-      </div>
-    </div>
-
-    <!-- 3. Main Menu Screen -->
-    <div id="main-menu-screen" class="ui-screen hidden">
-      <div class="glass-panel">
-        <h1 class="title-gold">GANESH RUN</h1>
+    <!-- 1. Subway Surfers-style Clean Start Screen (Direct Play, Zero Delay) -->
+    <div id="start-screen" class="ui-screen">
+      <div class="start-banner-container">
+        <h1 class="title-gold main-logo">GANESH RUN</h1>
         <p class="subtitle-divine">THE GREAT LADDU CHASE</p>
 
-        <div style="margin: 16px 0;">
-          <span id="menu-player-badge" style="display: inline-block; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #ffd700;">RUNNER: DEVOTEE</span>
-          <div id="menu-highscore-badge" style="font-size: 0.85rem; color: #bbb; margin-top: 6px;">HIGH SCORE: 0</div>
+        <div id="start-tap-button" class="tap-to-run-pill">
+          <span class="tap-play-icon">▶</span>
+          <span class="tap-play-text">TAP OR SWIPE TO RUN</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 10px;">
-          <button id="menu-play-btn" class="btn-gold" style="font-size: 1.3rem; padding: 18px;">▶ PLAY</button>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button id="menu-characters-btn" class="btn-secondary">AVATARS</button>
-            <button id="menu-powerups-btn" class="btn-secondary">POWER-UPS</button>
-            <button id="menu-leaderboard-btn" class="btn-secondary">RANKS</button>
-            <button id="menu-howtoplay-btn" class="btn-secondary">HOW TO PLAY</button>
+        <!-- Gesture & Keyboard Quick Hints -->
+        <div class="controls-guide-bar">
+          <div class="guide-item">
+            <span class="guide-icon">👆</span>
+            <span class="guide-text">SWIPE LEFT / RIGHT TO DODGE</span>
           </div>
-          <button id="menu-settings-btn" class="btn-secondary" style="margin-top: 4px;">⚙ SETTINGS</button>
+          <div class="guide-item">
+            <span class="guide-icon">⬆️</span>
+            <span class="guide-text">SWIPE UP TO JUMP</span>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">⬇️</span>
+            <span class="guide-text">SWIPE DOWN TO SLIDE</span>
+          </div>
+        </div>
+
+        <div class="start-footer-row">
+          <div id="menu-highscore-badge" class="badge-highscore">BEST: 0</div>
+          <div style="display: flex; gap: 8px;">
+            <button id="menu-characters-btn" class="btn-micro" title="Select Avatar">👘 AVATARS</button>
+            <button id="menu-settings-btn" class="btn-micro" title="Settings">⚙ SETTINGS</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 4. HUD Screen (Matched to Visual Reference Concept Art) -->
+    <!-- 2. Clean HUD Screen (Unobstructed View for Mobile & Laptop) -->
     <div id="hud-screen" class="ui-screen hidden">
       <!-- Top Row Header -->
       <div class="hud-top-bar">
@@ -106,21 +91,16 @@
       </div>
 
       <!-- Lord Shiva Danger Warning Alert -->
-      <div id="hud-shiva-alert" class="hidden" style="position: absolute; top: 14%; background: linear-gradient(90deg, #d90429, #e85d04); color: #fff; font-weight: 900; font-size: 0.95rem; padding: 10px 22px; border-radius: 30px; box-shadow: 0 0 25px #d90429; letter-spacing: 1.5px; animation: pulseGold 0.8s infinite; pointer-events: none;">
+      <div id="hud-shiva-alert" class="hidden" style="position: absolute; top: 12%; background: linear-gradient(90deg, #d90429, #e85d04); color: #fff; font-weight: 900; font-size: 0.95rem; padding: 10px 22px; border-radius: 30px; box-shadow: 0 0 25px #d90429; letter-spacing: 1.5px; animation: pulseGold 0.8s infinite; pointer-events: none;">
         🔱 SHIVA IS CATCHING UP!
       </div>
 
       <!-- Center Divine Mode Banner -->
       <div id="divine-mode-banner" class="hidden">⚡ DIVINE MODE ⚡</div>
 
-      <!-- Interactive Tutorial Prompt -->
-      <div id="hud-tutorial-prompt" class="hud-card hidden" style="position: absolute; top: 22%; background: rgba(255,215,0,0.25); border-color: #ffd700; color: #fff; font-weight: 800; font-size: 0.95rem; padding: 10px 20px;">
-        💡 SWIPE LEFT / RIGHT TO DODGE BLUE TRAINS
-      </div>
-
       <!-- Bottom Layout Bar -->
       <div class="hud-bottom-row">
-        <!-- Bottom Left: Shiva Chase Indicator (Concept Art: CATCH GANESHA / SHIVA) -->
+        <!-- Bottom Left: Shiva Chase Indicator -->
         <div class="shiva-chase-card" id="shiva-chase-box">
           <div class="shiva-chase-header">
             <span class="shiva-trident">🔱</span>
@@ -132,11 +112,10 @@
         </div>
 
         <!-- Center: Divine Mode Button (When 100% full) -->
-        <button id="divine-mode-btn" class="btn-divine-mode hidden">⚡ DIVINE MODE READY (SPACE / TAP)</button>
+        <button id="divine-mode-btn" class="btn-divine-mode hidden">⚡ DIVINE MODE (DOUBLE-TAP / SPACE)</button>
 
         <!-- Bottom Right: Power-Up Energy Bar & Active Badges -->
         <div class="powerup-hud-group">
-          <!-- Active powerup badges -->
           <div class="powerup-chips-row">
             <div id="badge-shield" class="powerup-chip hidden">🛡 SHIELD</div>
             <div id="badge-magnet" class="powerup-chip hidden">🧲 MAGNET <span id="badge-magnet-time">10s</span></div>
@@ -144,7 +123,6 @@
             <div id="badge-mushika" class="powerup-chip hidden">🐭 MUSHIKA <span id="badge-mushika-time">7s</span></div>
           </div>
 
-          <!-- Energy Meter Bar with Lightning Icon -->
           <div class="energy-meter-card">
             <span class="energy-lightning">⚡</span>
             <div class="energy-segments-container">
@@ -157,21 +135,9 @@
           </div>
         </div>
       </div>
-
-      <!-- Mobile Touch Controls Bar -->
-      <div class="mobile-touch-bar">
-        <div style="display: flex; gap: 10px;">
-          <button id="touch-left-btn" class="touch-btn">◀</button>
-          <button id="touch-right-btn" class="touch-btn">▶</button>
-        </div>
-        <div style="display: flex; gap: 10px;">
-          <button id="touch-jump-btn" class="touch-btn">▲</button>
-          <button id="touch-slide-btn" class="touch-btn">▼</button>
-        </div>
-      </div>
     </div>
 
-    <!-- 5. Pause Screen -->
+    <!-- 3. Pause Screen -->
     <div id="pause-screen" class="ui-screen hidden">
       <div class="glass-panel">
         <h1 class="title-gold" style="font-size: 2rem;">PAUSED</h1>
@@ -186,20 +152,18 @@
       </div>
     </div>
 
-    <!-- 6. Game Over Screen -->
+    <!-- 4. Quick Game Over Screen -->
     <div id="game-over-screen" class="ui-screen hidden">
       <div class="glass-panel">
         <p class="subtitle-divine" style="letter-spacing: 3px; color: #48cae4;">LORD SHIVA CAUGHT GANESHA!</p>
-        <h1 class="title-gold" style="font-size: 1.8rem; margin: 4px 0 8px 0;">"Caught you, little Ganesha!"</h1>
+        <h1 class="title-gold" style="font-size: 1.7rem; margin: 4px 0 8px 0;">"Caught you, little Ganesha!"</h1>
         <p style="font-size: 0.85rem; color: #ffd7a8; margin-bottom: 14px;">Time to share the sacred laddus for puja! 🙏</p>
-
-        <div id="gameover-player-name" style="font-size: 1.1rem; font-weight: 800; color: #ffd700; margin-bottom: 12px;">RUNNER</div>
 
         <div id="gameover-highscore-banner" class="hidden" style="background: linear-gradient(90deg, #ff6b00, #ffd700); color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 14px; letter-spacing: 1px;">
           🏆 NEW HIGH SCORE!
         </div>
 
-        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; padding: 14px 10px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+        <div style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; padding: 14px 10px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
           <div>
             <div style="font-size: 0.7rem; color: #aaa; font-weight: 700;">SCORE</div>
             <div id="gameover-score" style="font-size: 1.15rem; font-weight: 800; color: #fff;">0</div>
@@ -219,7 +183,7 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-          <button id="gameover-retry-btn" class="btn-gold">↻ RUN AGAIN</button>
+          <button id="gameover-retry-btn" class="btn-gold" style="font-size: 1.25rem; padding: 16px;">↻ TAP TO RUN AGAIN</button>
           <button id="gameover-menu-btn" class="btn-secondary">⌂ MAIN MENU</button>
         </div>
       </div>
