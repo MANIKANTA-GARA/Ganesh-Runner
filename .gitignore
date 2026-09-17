@@ -13,3 +13,6 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Secrets / Deploy scripts
+deploy_to_vercel.js
