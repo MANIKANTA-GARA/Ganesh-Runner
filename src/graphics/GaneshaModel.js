@@ -242,13 +242,26 @@ export class GaneshaModel {
   }
 
   jump() {
-    if (this.isJumping) return;
+    if (this.isSliding) {
+      this.isSliding = false;
+      this.characterGroup.position.y = 0;
+      this.characterGroup.rotation.x = 0;
+      this.characterGroup.scale.set(1.0, 1.0, 1.0);
+    }
     this.isJumping = true;
     this.jumpTime = 0;
   }
 
   slide() {
-    if (this.isSliding) return;
+    if (this.isJumping) {
+      // Fast-drop dive: immediately plunge to the ground and slide (Subway Surfers mechanic)
+      this.isJumping = false;
+      this.root.position.y = 0;
+      this.characterGroup.rotation.x = 0;
+      this.characterGroup.scale.set(1.0, 1.0, 1.0);
+      this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+      this.shadowMat.opacity = 0.55;
+    }
     this.isSliding = true;
     this.slideTime = 0;
   }
