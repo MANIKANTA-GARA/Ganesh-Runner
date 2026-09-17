@@ -124,48 +124,62 @@ export class Game {
     this.input.onPause = () => this.togglePause();
     this.input.onActivateDivine = () => this.handleDivineActivation();
     this.input.onActivateTrunk = () => this.handleTrunkPower();
+    this.input.onTap = () => this.handleTap();
+    this.input.onAnyInput = () => this.handleAnyInput();
+  }
+
+  handleTap() {
+    if (this.state === GAME_STATE.MENU || this.state === GAME_STATE.NAME_ENTRY || this.state === GAME_STATE.CINEMATIC) {
+      this.startRun();
+    }
+  }
+
+  handleAnyInput() {
+    if (this.state === GAME_STATE.MENU || this.state === GAME_STATE.NAME_ENTRY || this.state === GAME_STATE.CINEMATIC) {
+      this.startRun();
+    }
   }
 
   handleMoveLeft() {
-    if (this.state !== GAME_STATE.PLAYING) return;
+    if (this.state !== GAME_STATE.PLAYING) {
+      this.handleAnyInput();
+      return;
+    }
     if (this.currentLane > 0) {
       this.currentLane--;
       this.targetX = this.lanes[this.currentLane];
       this.sound.playLaneChange();
-      this.tutorialSteps.movedLeft = true;
-      this.ui.updateTutorialPrompt(this.tutorialSteps);
     }
   }
 
   handleMoveRight() {
-    if (this.state !== GAME_STATE.PLAYING) return;
+    if (this.state !== GAME_STATE.PLAYING) {
+      this.handleAnyInput();
+      return;
+    }
     if (this.currentLane < 2) {
       this.currentLane++;
       this.targetX = this.lanes[this.currentLane];
       this.sound.playLaneChange();
-      this.tutorialSteps.movedRight = true;
-      this.ui.updateTutorialPrompt(this.tutorialSteps);
     }
   }
 
   handleJump() {
-    if (this.state !== GAME_STATE.PLAYING) return;
-    if (!this.ganesha.isJumping && !this.ganesha.isSliding) {
-      this.ganesha.jump();
-      this.sound.playJump();
-      this.tutorialSteps.jumped = true;
-      this.ui.updateTutorialPrompt(this.tutorialSteps);
+    if (this.state !== GAME_STATE.PLAYING) {
+      this.handleAnyInput();
+      return;
     }
+    this.ganesha.jump();
+    this.sound.playJump();
   }
 
   handleSlide() {
-    if (this.state !== GAME_STATE.PLAYING) return;
-    if (!this.ganesha.isSliding && !this.ganesha.isJumping) {
-      this.ganesha.slide();
-      this.sound.playSlide();
-      this.tutorialSteps.slid = true;
-      this.ui.updateTutorialPrompt(this.tutorialSteps);
+    if (this.state !== GAME_STATE.PLAYING) {
+      this.handleAnyInput();
+      return;
     }
+    this.ganesha.slide();
+    this.sound.playSlide();
   }
 
   handleDivineActivation() {
