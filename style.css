@@ -1,0 +1,625 @@
+/* style.css - Ganesh Run: The Divine Run */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;600;700;800&display=swap');
+
+:root {
+  --gold-primary: #ffd700;
+  --gold-secondary: #d4af37;
+  --gold-glow: rgba(255, 215, 0, 0.45);
+  --saffron: #ff6b00;
+  --crimson: #d90429;
+  --bg-dark: #120e18;
+  --panel-bg: rgba(18, 14, 24, 0.84);
+  --panel-border: rgba(212, 175, 55, 0.4);
+  --font-title: 'Cinzel Decorative', Georgia, serif;
+  --font-ui: 'Outfit', -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-ui);
+  color: #fff;
+}
+
+#game-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+#ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ui-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Glassmorphism & Gold Panels */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 25px var(--gold-glow);
+  padding: 32px 28px;
+  max-width: 440px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+/* Typography */
+h1.title-gold {
+  font-family: var(--font-title);
+  font-size: 2.3rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 3px 6px rgba(0,0,0,0.9);
+  letter-spacing: 2px;
+  line-height: 1.2;
+}
+
+.subtitle-divine {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--gold-primary);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.btn-gold {
+  background: linear-gradient(135deg, #ffd700 0%, #ff8800 100%);
+  color: #1a0f00;
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 36px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 136, 0, 0.4), inset 0 1px 1px #fff;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-gold:hover, .btn-gold:active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(255, 180, 0, 0.6);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #f1f1f1;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 30px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: var(--gold-primary);
+}
+
+/* Input Fields */
+.input-field {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 20px 0 14px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Modals */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 4, 10, 0.78);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 20px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.8);
+  padding: 28px;
+  max-width: 520px;
+  width: 92%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  padding-bottom: 12px;
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  color: var(--gold-primary);
+  font-size: 1.4rem;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.6rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* HUD Overlay */
+#hud-screen {
+  pointer-events: none;
+  justify-content: space-between;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+.hud-top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+/* Concept Art: Pause Button */
+.hud-icon-btn {
+  background: rgba(16, 22, 38, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.4rem;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s, border-color 0.2s;
+}
+
+.hud-icon-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--gold-primary);
+}
+
+/* Center Distance Pill */
+.hud-distance-pill {
+  background: rgba(14, 11, 20, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 24px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.dist-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+}
+
+.dist-zone {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffaa00;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Top Right Group (Score, Multiplier, Coins, Target) */
+.hud-top-right-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.hud-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-multiplier-pill {
+  background: #ffcc00;
+  color: #1a1000;
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.hud-score-display {
+  background: rgba(16, 22, 38, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-family: 'Outfit', monospace, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.hud-coins-pill {
+  background: rgba(16, 22, 38, 0.88);
+  border: 1.5px solid rgba(255, 215, 0, 0.6);
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.hud-coins-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.hud-coins-symbol {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 4px #ffd700);
+}
+
+/* Target Ganesha Card (Concept Art) */
+.hud-target-card {
+  background: rgba(16, 22, 38, 0.88);
+  border: 1.5px solid #00b4d8;
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.target-title {
+  font-size: 0.65rem;
+  color: #8ecae6;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.target-name {
+  font-size: 0.85rem;
+  color: #ffd700;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* Bottom Row Layout */
+.hud-bottom-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  margin-bottom: 8px;
+}
+
+/* Shiva Chase Gauge (Bottom Left) */
+.shiva-chase-card {
+  background: rgba(16, 20, 32, 0.9);
+  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  border-radius: 14px;
+  padding: 8px 14px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 170px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+}
+
+.shiva-chase-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shiva-trident {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px #ffd700);
+}
+
+.shiva-title {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 1.2px;
+}
+
+.shiva-gauge-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shiva-gauge-fill {
+  height: 100%;
+  width: 15%;
+  background: linear-gradient(90deg, #2ec4b6, #ffd166);
+  border-radius: 10px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.shiva-gauge-fill.danger {
+  background: linear-gradient(90deg, #ff4d00, #d90429);
+  box-shadow: 0 0 10px #d90429;
+  animation: pulseGauge 0.7s infinite;
+}
+
+@keyframes pulseGauge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Power-Up HUD Group (Bottom Right) */
+.powerup-hud-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.powerup-chips-row {
+  display: flex;
+  gap: 6px;
+}
+
+.powerup-chip {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--gold-primary);
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Concept Art: Segmented Power-Up Bar with Lightning Bolt */
+.energy-meter-card {
+  background: rgba(16, 22, 38, 0.9);
+  border: 1.5px solid #00b4d8;
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+}
+
+.energy-lightning {
+  font-size: 1.4rem;
+  color: #00f5d4;
+  filter: drop-shadow(0 0 8px #00f5d4);
+}
+
+.energy-segments-container {
+  display: flex;
+  gap: 4px;
+}
+
+.energy-segment {
+  width: 22px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(0, 180, 216, 0.5);
+  border-radius: 3px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.energy-segment.active {
+  background: linear-gradient(180deg, #ffea00, #ff9100);
+  border-color: #ffd700;
+  box-shadow: 0 0 8px #ffea00;
+}
+
+.energy-pct-text {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #8ecae6;
+  min-width: 32px;
+}
+
+/* On-screen touch controls */
+.mobile-touch-bar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  pointer-events: auto;
+  margin-top: 6px;
+}
+
+.touch-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 215, 0, 0.4);
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.touch-btn:active {
+  background: rgba(255, 215, 0, 0.35);
+  transform: scale(0.92);
+}
+
+/* Tables & Lists */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.styled-table th, .styled-table td {
+  padding: 10px;
+  text-align: left;
+}
+
+.styled-table th {
+  color: var(--gold-primary);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255,215,0,0.25);
+}
+
+.player-row {
+  background: rgba(255, 215, 0, 0.15);
+  font-weight: 800;
+  color: var(--gold-primary);
+  border-radius: 8px;
+}
+
+/* Outfit Selection Cards */
+.outfit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.outfit-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.outfit-card.active {
+  border-color: var(--gold-primary);
+  background: rgba(255,215,0,0.18);
+  box-shadow: 0 0 15px rgba(255,215,0,0.3);
+}
+
+/* Settings Toggle Buttons */
+.toggle-group {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 16px 0;
+}
+
+.toggle-group button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,215,0,0.25);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle-group button.active {
+  background: var(--gold-primary);
+  color: #000;
+  border-color: var(--gold-primary);
+}
