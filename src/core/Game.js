@@ -145,10 +145,14 @@ export class Game {
       this.handleAnyInput();
       return;
     }
+    const now = performance.now();
+    if (now - this.lastLaneChangeTime < 180) return; // Exactly 1 track per swipe!
+
     if (this.currentLane > 0) {
       this.currentLane--;
       this.targetX = this.lanes[this.currentLane];
       this.sound.playLaneChange();
+      this.lastLaneChangeTime = now;
     }
   }
 
@@ -157,10 +161,14 @@ export class Game {
       this.handleAnyInput();
       return;
     }
+    const now = performance.now();
+    if (now - this.lastLaneChangeTime < 180) return; // Exactly 1 track per swipe!
+
     if (this.currentLane < 2) {
       this.currentLane++;
       this.targetX = this.lanes[this.currentLane];
       this.sound.playLaneChange();
+      this.lastLaneChangeTime = now;
     }
   }
 
@@ -231,6 +239,25 @@ export class Game {
     this.state = GAME_STATE.PLAYING;
     this.sound.startRunningMusic();
     this.ui.showHUD();
+    this.ui.updateHUD({
+      score: this.score.score,
+      distance: Math.floor(this.score.distance),
+      coins: this.score.laddus,
+      laddus: this.score.laddus,
+      multiplier: this.powerUps.getScoreMultiplier(),
+      divineMeter: this.powerUps.divineMeter,
+      isDivineMode: this.powerUps.isDivineMode,
+      hasShield: this.powerUps.hasShield,
+      isMushika: this.powerUps.isMushikaActive,
+      mushikaTime: 0,
+      isMagnet: this.powerUps.isMagnetActive,
+      magnetTime: 0,
+      isMultiplier: this.powerUps.isMultiplierActive,
+      multiplierTime: 0,
+      zoneName: this.environment.activeZone.name,
+      isShivaClose: false,
+      shivaDangerPercent: 15
+    });
     this.ui.updateTutorialPrompt(this.tutorialSteps);
   }
 
@@ -240,6 +267,8 @@ export class Game {
     this.currentX = 0;
     this.currentSpeed = this.baseSpeed;
     this.runTime = 0;
+    this.gracePeriodTimer = 3.5; // 3.5s safe start grace period
+    this.lastLaneChangeTime = 0;
 
     this.ganesha.reset();
     this.chaser.reset();
@@ -408,31 +437,37 @@ export class Game {
       this.powerUps.activateMushikaDash();
     }
 
-    // 6. Check Obstacle Collisions — Instant Out on Touch!
-    const colResult = this.obstacles.checkCollision({
-      position: playerPos,
-      isJumping: this.ganesha.isJumping,
-      isSliding: this.ganesha.isSliding
-    });
+    if (this.gracePeriodTimer > 0) {
+      this.gracePeriodTimer -= delta;
+    }
 
-    if (colResult.hit) {
-      if (this.powerUps.isDivineMode || this.powerUps.isMushikaActive) {
-        // Divine invincible rush smashes through obstacles
-        this.obstacles.destroyObstacle(colResult.obstacle);
-        this.triggerCameraShake(0.35, 0.3);
-        this.score.score += 500;
-      } else if (this.powerUps.hasShield) {
-        // Divine shield absorbs exactly one hit
-        this.powerUps.breakShield();
-        this.obstacles.destroyObstacle(colResult.obstacle);
-        this.triggerCameraShake(0.45, 0.35);
-      } else {
-        // Instant Out! Ganesha touched an obstacle -> Game Over immediately!
-        this.obstacles.destroyObstacle(colResult.obstacle);
-        this.triggerCameraShake(0.75, 0.6);
-        this.sound.playCollision();
-        this.gameOver();
-        return;
+    // 6. Check Obstacle Collisions — Instant Out on Touch (Active after safe grace period)
+    if (this.gracePeriodTimer <= 0) {
+      const colResult = this.obstacles.checkCollision({
+        position: playerPos,
+        isJumping: this.ganesha.isJumping,
+        isSliding: this.ganesha.isSliding
+      });
+
+      if (colResult.hit) {
+        if (this.powerUps.isDivineMode || this.powerUps.isMushikaActive) {
+          // Divine invincible rush smashes through obstacles
+          this.obstacles.destroyObstacle(colResult.obstacle);
+          this.triggerCameraShake(0.35, 0.3);
+          this.score.score += 500;
+        } else if (this.powerUps.hasShield) {
+          // Divine shield absorbs exactly one hit
+          this.powerUps.breakShield();
+          this.obstacles.destroyObstacle(colResult.obstacle);
+          this.triggerCameraShake(0.45, 0.35);
+        } else {
+          // Instant Out! Ganesha touched an obstacle -> Game Over immediately!
+          this.obstacles.destroyObstacle(colResult.obstacle);
+          this.triggerCameraShake(0.75, 0.6);
+          this.sound.playCollision();
+          this.gameOver();
+          return;
+        }
       }
     }
 
