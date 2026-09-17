@@ -324,11 +324,16 @@ h1.title-gold {
   border-radius: 8px;
   padding: 4px 14px;
   font-family: 'Outfit', monospace, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  min-width: 110px;
+  text-align: right;
   font-size: 1.45rem;
   font-weight: 900;
   color: #fff;
   letter-spacing: 2px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  white-space: nowrap;
 }
 
 .hud-coins-pill {
@@ -340,12 +345,16 @@ h1.title-gold {
   align-items: center;
   gap: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
 }
 
 .hud-coins-val {
   font-size: 1.25rem;
   font-weight: 900;
   color: #ffd700;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-coins-symbol {
@@ -353,16 +362,9 @@ h1.title-gold {
   filter: drop-shadow(0 0 4px #ffd700);
 }
 
-/* Target Ganesha Card (Concept Art) */
+/* Target Ganesha Card - Hidden from active HUD to prevent right-side layout crowding and shaking */
 .hud-target-card {
-  background: rgba(16, 22, 38, 0.88);
-  border: 1.5px solid #00b4d8;
-  border-radius: 12px;
-  padding: 6px 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  display: none !important;
 }
 
 .target-title {
@@ -770,11 +772,81 @@ h1.title-gold {
   .guide-item {
     font-size: 0.74rem;
   }
-  .hud-distance-pill {
-    padding: 4px 10px;
-    font-size: 0.82rem;
-  }
   .hud-top-bar {
-    padding: 8px 10px;
+    padding: 6px 8px;
+    gap: 4px;
+    align-items: center;
+  }
+  .hud-icon-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+  .hud-distance-pill {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    gap: 4px;
+    flex-shrink: 1;
+  }
+  .dist-val {
+    font-size: 0.95rem;
+  }
+  .dist-zone {
+    font-size: 0.62rem;
+    letter-spacing: 0.5px;
+  }
+  .hud-top-right-group {
+    flex-shrink: 0;
+    gap: 3px;
+  }
+  .hud-score-display {
+    font-size: 1.15rem;
+    padding: 3px 8px;
+    min-width: 82px;
+    letter-spacing: 1px;
+  }
+  .hud-multiplier-pill {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+  .hud-coins-pill {
+    padding: 3px 8px;
+  }
+  .hud-coins-val {
+    font-size: 1.05rem;
+  }
+  .hud-bottom-row {
+    margin-bottom: 4px;
+    gap: 6px;
+  }
+  .shiva-chase-card {
+    min-width: 110px;
+    max-width: 135px;
+    padding: 5px 8px;
+    gap: 3px;
+  }
+  .shiva-title {
+    font-size: 0.68rem;
+  }
+  .energy-meter-card {
+    padding: 5px 8px;
+    gap: 6px;
+  }
+  .energy-segment {
+    width: 14px;
+    height: 12px;
+  }
+  .energy-pct-text {
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    min-width: 28px;
+    text-align: right;
+  }
+  .powerup-chip {
+    padding: 3px 6px;
+    font-size: 0.68rem;
   }
 }
+
