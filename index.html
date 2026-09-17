@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Ganesh Run — The Divine Run</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- 3D Canvas Container -->
+  <div id="game-canvas-container"></div>
+
+  <!-- UI Layer Overlays -->
+  <div id="ui-layer">
+
+    <!-- 1. Name Entry Screen -->
+    <div id="name-entry-screen" class="ui-screen hidden">
+      <div class="glass-panel">
+        <h1 class="title-gold">GANESH RUN</h1>
+        <p class="subtitle-divine">The Divine Run</p>
+        <div style="margin: 24px 0 6px 0;">
+          <h2 style="font-size: 1.3rem; color: #fff; margin-bottom: 6px;">Welcome, Runner!</h2>
+          <p style="font-size: 0.95rem; color: #d1c7bd;">Enter your name to begin your divine journey.</p>
+        </div>
+        <input id="player-name-input" class="input-field" type="text" maxlength="15" placeholder="ENTER YOUR NAME" autocomplete="off" autocorrect="off">
+        <p id="name-error-msg" class="hidden" style="color: #ff4d4d; font-size: 0.85rem; margin-bottom: 12px;">Please enter your name to continue.</p>
+        <button id="name-continue-btn" class="btn-gold">CONTINUE →</button>
+      </div>
+    </div>
+
+    <!-- 2. Cinematic Intro Screen -->
+    <div id="cinematic-screen" class="ui-screen hidden">
+      <div class="glass-panel" style="background: rgba(14, 10, 20, 0.75);">
+        <p class="subtitle-divine" style="letter-spacing: 5px;">THE GREAT LADDU CHASE</p>
+        <h1 id="cinematic-player-welcome" class="title-gold" style="font-size: 1.8rem; margin: 12px 0;">WELCOME, RUNNER!</h1>
+        <p style="font-size: 0.95rem; line-height: 1.5; color: #ffd7a8; margin-bottom: 24px;">
+          Little Lord Ganesha has taken the sacred golden Laddus! Now his loving father <strong>Lord Shiva</strong> is playfully chasing him through the bustling festival streets. Dodge oncoming Auto-Rickshaws, collect sweet Laddus, and run!
+        </p>
+        <p style="font-size: 1.1rem; font-weight: 800; color: #ffd700; margin-bottom: 20px; letter-spacing: 1px;">YOUR JOURNEY BEGINS NOW</p>
+        <button id="cinematic-start-btn" class="btn-gold">▶ START RUN</button>
+      </div>
+    </div>
+
+    <!-- 3. Main Menu Screen -->
+    <div id="main-menu-screen" class="ui-screen hidden">
+      <div class="glass-panel">
+        <h1 class="title-gold">GANESH RUN</h1>
+        <p class="subtitle-divine">THE GREAT LADDU CHASE</p>
+
+        <div style="margin: 16px 0;">
+          <span id="menu-player-badge" style="display: inline-block; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #ffd700;">RUNNER: DEVOTEE</span>
+          <div id="menu-highscore-badge" style="font-size: 0.85rem; color: #bbb; margin-top: 6px;">HIGH SCORE: 0</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 10px;">
+          <button id="menu-play-btn" class="btn-gold" style="font-size: 1.3rem; padding: 18px;">▶ PLAY</button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button id="menu-characters-btn" class="btn-secondary">AVATARS</button>
+            <button id="menu-powerups-btn" class="btn-secondary">POWER-UPS</button>
+            <button id="menu-leaderboard-btn" class="btn-secondary">RANKS</button>
+            <button id="menu-howtoplay-btn" class="btn-secondary">HOW TO PLAY</button>
+          </div>
+          <button id="menu-settings-btn" class="btn-secondary" style="margin-top: 4px;">⚙ SETTINGS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. HUD Screen (Matched to Visual Reference Concept Art) -->
+    <div id="hud-screen" class="ui-screen hidden">
+      <!-- Top Row Header -->
+      <div class="hud-top-bar">
+        <!-- Top Left: Pause Button -->
+        <button id="hud-pause-btn" class="hud-icon-btn" title="Pause Game">⏸</button>
+
+        <!-- Top Center: Distance & Zone -->
+        <div class="hud-distance-pill">
+          <span style="font-size: 1.1rem;">🏃</span>
+          <span id="hud-distance" class="dist-val">0m</span>
+          <span id="hud-zone" class="dist-zone">TEMPLE CITY</span>
+        </div>
+
+        <!-- Top Right Group: Score, Multiplier, Coins & Target Badge -->
+        <div class="hud-top-right-group">
+          <div class="hud-stats-row">
+            <span id="hud-multiplier" class="hud-multiplier-pill">x1</span>
+            <span id="hud-score" class="hud-score-display">000000</span>
+          </div>
+
+          <div class="hud-stats-row" style="margin-top: 4px; justify-content: flex-end;">
+            <div class="hud-coins-pill" title="Laddus Collected">
+              <span id="hud-coins" class="hud-coins-val">0</span>
+              <span class="hud-coins-symbol" style="font-size: 1.15rem; filter: drop-shadow(0 0 4px #ffa500);">🟡</span>
+              <span style="font-size: 0.72rem; font-weight: 900; color: #ffd700; letter-spacing: 0.5px; margin-left: 2px;">LADDUS</span>
+            </div>
+          </div>
+
+          <!-- Target Ganesha Badge (Concept art) -->
+          <div class="hud-target-card">
+            <canvas id="target-ganesha-badge-canvas" width="48" height="48" style="border-radius: 8px; border: 1.5px solid #ffd700; background: #2a1538;"></canvas>
+            <div style="line-height: 1.1;">
+              <div class="target-title">TARGET</div>
+              <div class="target-name">GANESHA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lord Shiva Danger Warning Alert -->
+      <div id="hud-shiva-alert" class="hidden" style="position: absolute; top: 14%; background: linear-gradient(90deg, #d90429, #e85d04); color: #fff; font-weight: 900; font-size: 0.95rem; padding: 10px 22px; border-radius: 30px; box-shadow: 0 0 25px #d90429; letter-spacing: 1.5px; animation: pulseGold 0.8s infinite; pointer-events: none;">
+        🔱 SHIVA IS CATCHING UP!
+      </div>
+
+      <!-- Center Divine Mode Banner -->
+      <div id="divine-mode-banner" class="hidden">⚡ DIVINE MODE ⚡</div>
+
+      <!-- Interactive Tutorial Prompt -->
+      <div id="hud-tutorial-prompt" class="hud-card hidden" style="position: absolute; top: 22%; background: rgba(255,215,0,0.25); border-color: #ffd700; color: #fff; font-weight: 800; font-size: 0.95rem; padding: 10px 20px;">
+        💡 SWIPE LEFT / RIGHT TO DODGE BLUE TRAINS
+      </div>
+
+      <!-- Bottom Layout Bar -->
+      <div class="hud-bottom-row">
+        <!-- Bottom Left: Shiva Chase Indicator (Concept Art: CATCH GANESHA / SHIVA) -->
+        <div class="shiva-chase-card" id="shiva-chase-box">
+          <div class="shiva-chase-header">
+            <span class="shiva-trident">🔱</span>
+            <span class="shiva-title">CATCH GANESHA</span>
+          </div>
+          <div class="shiva-gauge-track">
+            <div id="shiva-gauge-fill" class="shiva-gauge-fill"></div>
+          </div>
+        </div>
+
+        <!-- Center: Divine Mode Button (When 100% full) -->
+        <button id="divine-mode-btn" class="btn-divine-mode hidden">⚡ DIVINE MODE READY (SPACE / TAP)</button>
+
+        <!-- Bottom Right: Power-Up Energy Bar & Active Badges -->
+        <div class="powerup-hud-group">
+          <!-- Active powerup badges -->
+          <div class="powerup-chips-row">
+            <div id="badge-shield" class="powerup-chip hidden">🛡 SHIELD</div>
+            <div id="badge-magnet" class="powerup-chip hidden">🧲 MAGNET <span id="badge-magnet-time">10s</span></div>
+            <div id="badge-multiplier" class="powerup-chip hidden">2x LADDUS <span id="badge-multiplier-time">10s</span></div>
+            <div id="badge-mushika" class="powerup-chip hidden">🐭 MUSHIKA <span id="badge-mushika-time">7s</span></div>
+          </div>
+
+          <!-- Energy Meter Bar with Lightning Icon -->
+          <div class="energy-meter-card">
+            <span class="energy-lightning">⚡</span>
+            <div class="energy-segments-container">
+              <div class="energy-segment" id="seg-1"></div>
+              <div class="energy-segment" id="seg-2"></div>
+              <div class="energy-segment" id="seg-3"></div>
+              <div class="energy-segment" id="seg-4"></div>
+            </div>
+            <span id="divine-meter-text" class="energy-pct-text">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Touch Controls Bar -->
+      <div class="mobile-touch-bar">
+        <div style="display: flex; gap: 10px;">
+          <button id="touch-left-btn" class="touch-btn">◀</button>
+          <button id="touch-right-btn" class="touch-btn">▶</button>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button id="touch-jump-btn" class="touch-btn">▲</button>
+          <button id="touch-slide-btn" class="touch-btn">▼</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Pause Screen -->
+    <div id="pause-screen" class="ui-screen hidden">
+      <div class="glass-panel">
+        <h1 class="title-gold" style="font-size: 2rem;">PAUSED</h1>
+        <p class="subtitle-divine" style="margin-bottom: 24px;">JOURNEY RESTING</p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+          <button id="pause-resume-btn" class="btn-gold">RESUME</button>
+          <button id="pause-restart-btn" class="btn-secondary">RESTART</button>
+          <button id="pause-settings-btn" class="btn-secondary">SETTINGS</button>
+          <button id="pause-menu-btn" class="btn-secondary">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Game Over Screen -->
+    <div id="game-over-screen" class="ui-screen hidden">
+      <div class="glass-panel">
+        <p class="subtitle-divine" style="letter-spacing: 3px; color: #48cae4;">LORD SHIVA CAUGHT GANESHA!</p>
+        <h1 class="title-gold" style="font-size: 1.8rem; margin: 4px 0 8px 0;">"Caught you, little Ganesha!"</h1>
+        <p style="font-size: 0.85rem; color: #ffd7a8; margin-bottom: 14px;">Time to share the sacred laddus for puja! 🙏</p>
+
+        <div id="gameover-player-name" style="font-size: 1.1rem; font-weight: 800; color: #ffd700; margin-bottom: 12px;">RUNNER</div>
+
+        <div id="gameover-highscore-banner" class="hidden" style="background: linear-gradient(90deg, #ff6b00, #ffd700); color: #000; font-weight: 900; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 14px; letter-spacing: 1px;">
+          🏆 NEW HIGH SCORE!
+        </div>
+
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; padding: 14px 10px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+          <div>
+            <div style="font-size: 0.7rem; color: #aaa; font-weight: 700;">SCORE</div>
+            <div id="gameover-score" style="font-size: 1.15rem; font-weight: 800; color: #fff;">0</div>
+          </div>
+          <div>
+            <div style="font-size: 0.7rem; color: #aaa; font-weight: 700;">DISTANCE</div>
+            <div id="gameover-distance" style="font-size: 1.15rem; font-weight: 800; color: #ffd700;">0m</div>
+          </div>
+          <div>
+            <div style="font-size: 0.7rem; color: #ffd700; font-weight: 700;">LADDUS 🟡</div>
+            <div id="gameover-coins" style="font-size: 1.15rem; font-weight: 800; color: #ffd700;">0</div>
+          </div>
+          <div>
+            <div style="font-size: 0.7rem; color: #aaa; font-weight: 700;">BEST</div>
+            <div id="gameover-modaks" style="font-size: 1.15rem; font-weight: 800; color: #ffa500;">0</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <button id="gameover-retry-btn" class="btn-gold">↻ RUN AGAIN</button>
+          <button id="gameover-menu-btn" class="btn-secondary">⌂ MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Characters Modal -->
+    <div id="characters-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">DIVINE AVATARS</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <p style="font-size: 0.9rem; color: #ccc;">Select Lord Ganesha's blessed attire for your run:</p>
+        <div class="outfit-grid">
+          <div class="outfit-card active" data-outfit="pitambara">
+            <div>
+              <div style="font-weight: 800; color: #ffd700;">Pitambara Radiance</div>
+              <div style="font-size: 0.8rem; color: #aaa;">Golden yellow silk dhoti, golden Mukut & rubies</div>
+            </div>
+            <span style="font-size: 1.4rem;">✨</span>
+          </div>
+          <div class="outfit-card" data-outfit="rudraksha">
+            <div>
+              <div style="font-weight: 800; color: #ff4d4d;">Rudraksha Royal Silk</div>
+              <div style="font-size: 0.8rem; color: #aaa;">Crimson silk, sacred rudraksha beads & emeralds</div>
+            </div>
+            <span style="font-size: 1.4rem;">📿</span>
+          </div>
+          <div class="outfit-card" data-outfit="kailash">
+            <div>
+              <div style="font-weight: 800; color: #48cae4;">Kailash Celestial White</div>
+              <div style="font-size: 0.8rem; color: #aaa;">Pure celestial white dhoti & sapphire aura</div>
+            </div>
+            <span style="font-size: 1.4rem;">🏔</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Power-Ups Modal -->
+    <div id="powerups-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">DIVINE POWERS</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
+            <span style="font-size: 2rem;">🛡</span>
+            <div>
+              <h3 style="color: #ffd700; font-size: 1rem;">DIVINE SHIELD</h3>
+              <p style="font-size: 0.85rem; color: #ccc;">Creates a radiant golden energy barrier that absorbs one obstacle collision with invincibility grace.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
+            <span style="font-size: 2rem;">🐭</span>
+            <div>
+              <h3 style="color: #ffd700; font-size: 1rem;">MUSHIKA DASH</h3>
+              <p style="font-size: 0.85rem; color: #ccc;">Summons Mushika, Ganesha's celestial vahana! Sprints at extreme speed, blasting obstacles and leaving Lord Shiva far behind.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
+            <span style="font-size: 2rem;">🐘</span>
+            <div>
+              <h3 style="color: #ffd700; font-size: 1rem;">TRUNK POWER</h3>
+              <p style="font-size: 0.85rem; color: #ccc;">Releases a majestic golden shockwave from Ganesha's trunk, clearing oncoming vehicles and barriers.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.4); padding: 12px; border-radius: 12px;">
+            <span style="font-size: 2rem;">⚡</span>
+            <div>
+              <h3 style="color: #ffd700; font-size: 1rem;">DIVINE MODE (100% METER)</h3>
+              <p style="font-size: 0.85rem; color: #ffd7a8;">Collect sweet Laddus & Diyas to fill meter. Triggers golden solar aura, 3x score multiplier, hyper-speed, and total invincibility!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">LEADERBOARD</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>RANK</th>
+              <th>RUNNER</th>
+              <th>DIST</th>
+              <th>SCORE</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 10. How to Play Modal -->
+    <div id="how-to-play-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">HOW TO PLAY</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
+          <div style="background: rgba(255,255,255,0.06); padding: 10px; border-radius: 10px;">
+            <strong style="color: #ffd700;">🔱 OUTRUN LORD SHIVA:</strong>
+            <p style="margin-top: 4px; color: #ddd; line-height: 1.4;">Lord Shiva is chasing you! If you stumble on obstacles, Shiva closes in. Dodge cleanly to maintain distance!</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 10px; border-radius: 10px;">
+            <strong style="color: #ffd700;">🛺 ONCOMING VEHICLES:</strong>
+            <p style="margin-top: 4px; color: #ddd; line-height: 1.4;">Watch out for oncoming Auto-Rickshaws & street vans driving towards you! Listen for their horns and steer out of the lane.</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 10px; border-radius: 10px;">
+            <strong style="color: #ffd700;">📱 CONTROLS:</strong>
+            <ul style="margin: 6px 0 0 18px; color: #ddd; line-height: 1.4;">
+              <li><strong>TILT PHONE / A, D:</strong> Steer left / right</li>
+              <li><strong>SWIPE UP / W, SPACE:</strong> Jump</li>
+              <li><strong>SWIPE DOWN / S:</strong> Slide</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">SETTINGS</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <div style="text-align: left;">
+          <label style="font-size: 0.85rem; color: #ffd700; font-weight: 700;">CONTROL MODE</label>
+          <div class="toggle-group">
+            <button class="control-mode-btn active" data-mode="HYBRID">HYBRID</button>
+            <button class="control-mode-btn" data-mode="TILT">TILT</button>
+            <button class="control-mode-btn" data-mode="SWIPE">SWIPE</button>
+          </div>
+
+          <label style="font-size: 0.85rem; color: #ffd700; font-weight: 700;">TILT SENSITIVITY</label>
+          <div class="toggle-group">
+            <button class="sensitivity-btn" data-sens="LOW">LOW</button>
+            <button class="sensitivity-btn active" data-sens="MEDIUM">MEDIUM</button>
+            <button class="sensitivity-btn" data-sens="HIGH">HIGH</button>
+          </div>
+
+          <button id="open-calibrate-btn" class="btn-secondary" style="margin-bottom: 16px;">📱 CALIBRATE PHONE TILT</button>
+
+          <label style="font-size: 0.85rem; color: #ffd700; font-weight: 700; margin-top: 10px; display: block;">AUDIO</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+            <span>Music (Dhol, Bansuri & Damru)</span>
+            <input id="toggle-music" type="checkbox" checked style="transform: scale(1.3); accent-color: #ffd700;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+            <span>Sound Effects (SFX & Horns)</span>
+            <input id="toggle-sfx" type="checkbox" checked style="transform: scale(1.3); accent-color: #ffd700;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. Calibration Modal -->
+    <div id="calibrate-modal" class="modal-overlay hidden">
+      <div class="modal-content" style="text-align: center;">
+        <h2 class="modal-title" style="margin-bottom: 12px;">CALIBRATE YOUR PHONE</h2>
+        <p style="color: #ddd; font-size: 0.95rem; margin-bottom: 20px;">
+          Hold your phone in your normal, comfortable playing position and tap Calibrate.
+        </p>
+        <button id="calibrate-action-btn" class="btn-gold">CALIBRATE</button>
+        <div id="calibrate-status" style="margin-top: 14px; font-weight: 700;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
