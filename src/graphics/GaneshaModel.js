@@ -454,13 +454,13 @@ export class GaneshaModel {
       this.shadowMesh.scale.set(shadowScale, shadowScale, 1.0);
       this.shadowMat.opacity = 0.55 * shadowScale;
 
-      // G. Graceful, smooth scarf flutter
-      const windWave = Math.sin(this.runCycle * 2.0);
-      this.rightScarf.rotation.z = -0.28 - windWave * 0.08;
-      this.rightScarf.rotation.x = 0.32 + Math.cos(this.runCycle * 2.0) * 0.08;
+      // G. Rock-solid, calm, smooth wind flow (ZERO high-frequency shaking)
+      const windWave = Math.sin(this.runCycle * 0.8) * 0.025;
+      this.rightScarf.rotation.z = -0.28 - windWave;
+      this.rightScarf.rotation.x = 0.30 + Math.cos(this.runCycle * 0.8) * 0.02;
       this.rightScarf.position.y = 1.25;
 
-      this.leftScarf.rotation.z = 0.22 + windWave * 0.06;
+      this.leftScarf.rotation.z = 0.22 + windWave;
       this.leftScarf.rotation.x = 0.24;
     }
 
