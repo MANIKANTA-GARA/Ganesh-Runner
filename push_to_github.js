@@ -98,7 +98,8 @@ async function main() {
     '.system_generated',
     'dist',
     '.DS_Store',
-    'Thumbs.db'
+    'Thumbs.db',
+    'deploy_to_vercel.js'
   ];
 
   async function getAllFiles(dir, baseDir = dir) {
