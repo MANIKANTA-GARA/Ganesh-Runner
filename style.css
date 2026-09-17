@@ -21,7 +21,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 html, body {
@@ -31,6 +31,7 @@ html, body {
   background-color: var(--bg-dark);
   font-family: var(--font-ui);
   color: #fff;
+  touch-action: none;
 }
 
 #game-canvas-container {
@@ -622,4 +623,158 @@ h1.title-gold {
   background: var(--gold-primary);
   color: #000;
   border-color: var(--gold-primary);
+}
+
+/* Subway Surfers-Style Start Overlay (Distraction-free) */
+.start-banner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 460px;
+  width: 90%;
+  padding: 26px 22px;
+  background: radial-gradient(circle at center, rgba(32, 16, 48, 0.78) 0%, rgba(14, 9, 20, 0.9) 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.45);
+  border-radius: 26px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 215, 0, 0.35);
+  animation: floatStart 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes floatStart {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
+.main-logo {
+  font-size: 2.6rem;
+  letter-spacing: 3px;
+  margin-bottom: 2px;
+}
+
+.tap-to-run-pill {
+  margin: 22px 0 16px 0;
+  width: 100%;
+  padding: 18px 24px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ffd700 0%, #ff8800 50%, #ff5500 100%);
+  color: #1a0800;
+  font-family: var(--font-ui);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  box-shadow: 0 8px 25px rgba(255, 136, 0, 0.6), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: pulseGlow 1.6s infinite ease-in-out;
+  transition: transform 0.15s ease;
+}
+
+.tap-to-run-pill:active {
+  transform: scale(0.96);
+}
+
+.tap-play-icon {
+  font-size: 1.4rem;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(255, 136, 0, 0.5), 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 10px 32px rgba(255, 136, 0, 0.85), 0 0 28px rgba(255, 215, 0, 0.7);
+    transform: scale(1.03);
+  }
+}
+
+.controls-guide-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  border-radius: 14px;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #e2d9cc;
+}
+
+.guide-icon {
+  font-size: 1rem;
+}
+
+.start-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-top: 6px;
+}
+
+.badge-highscore {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.btn-micro {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #fff;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-micro:active {
+  background: rgba(255, 215, 0, 0.3);
+  transform: scale(0.94);
+}
+
+/* Mobile Screen Tuning for Subway Surfers Touch Controls */
+@media (max-width: 600px) {
+  .main-logo {
+    font-size: 2.1rem;
+  }
+  .tap-to-run-pill {
+    font-size: 1.15rem;
+    padding: 15px 20px;
+  }
+  .start-banner-container {
+    padding: 18px 16px;
+    width: 94%;
+  }
+  .guide-item {
+    font-size: 0.74rem;
+  }
+  .hud-distance-pill {
+    padding: 4px 10px;
+    font-size: 0.82rem;
+  }
+  .hud-top-bar {
+    padding: 8px 10px;
+  }
 }
