@@ -21,7 +21,7 @@ export class ObstacleManager {
     this.obstacles = [];
     this.laneX = [-3.0, 0, 3.0];
     this.runTime = 0;
-    this.startSafeZone = 45; // First 45m gentle intro
+    this.startSafeZone = 65; // First 65m completely open track intro
     this.spawnAheadDistance = 140; // Spawn waves ~140m ahead
     this.minWaveInterval = 32; // Fair spacing between obstacle waves
     this.nextWaveZ = -this.startSafeZone;
@@ -229,7 +229,8 @@ export class ObstacleManager {
   // SPAWN DYNAMIC WAVE (First 20s gentle intro, then escalating dense obstacles!)
   spawnWave(z, runTime = 0) {
     const lanes = [0, 1, 2];
-    const freeLane = Math.floor(Math.random() * 3); // Guaranteed 100% open or traversable lane!
+    // Guarantee center lane (1) is 100% open during first 10s for comfortable straight running
+    const freeLane = (runTime < 10.0) ? 1 : Math.floor(Math.random() * 3);
     const blockedLanes = lanes.filter(l => l !== freeLane);
 
     // 1. FIRST 20 SECONDS: Gentle warm-up intro (only 1 obstacle at a time, 2 open lanes)
