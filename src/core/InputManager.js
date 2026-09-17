@@ -37,7 +37,7 @@ export class InputManager {
     this.initKeyboard();
   }
 
-  // --- Mobile Touch Swipes (Subway Surfers Style) ---
+  // --- Mobile Touch Swipes (Subway Surfers Style: Exactly 1 Track Per Swipe) ---
   initTouch() {
     const handleTouchStart = (e) => {
       if (e.touches.length === 0) return;
@@ -45,6 +45,7 @@ export class InputManager {
       this.touchStartX = t.clientX;
       this.touchStartY = t.clientY;
       this.touchStartTime = performance.now();
+      this.hasTriggeredSwipe = false;
       this.isSwiping = true;
 
       this.onAnyInput?.();
@@ -52,8 +53,10 @@ export class InputManager {
 
     const handleTouchMove = (e) => {
       if (!this.isSwiping || e.touches.length === 0) return;
-      // Prevent browser default pull-to-refresh and pinch-zoom behaviors
       if (e.cancelable) e.preventDefault();
+
+      // Lock: Exactly 1 action per swipe stroke (never jump 2 tracks!)
+      if (this.hasTriggeredSwipe) return;
 
       const t = e.touches[0];
       const dx = t.clientX - this.touchStartX;
@@ -61,10 +64,11 @@ export class InputManager {
       const absX = Math.abs(dx);
       const absY = Math.abs(dy);
 
-      // Trigger action as soon as the finger crosses the swipe threshold in mid-air!
       if (Math.max(absX, absY) >= this.swipeThreshold) {
+        this.hasTriggeredSwipe = true; // Locked until next stroke!
+
         if (absX > absY) {
-          // Horizontal swipe
+          // Horizontal swipe: move to adjacent single sidetrack only
           if (dx > 0) {
             this.onMoveRight?.();
           } else {
@@ -78,11 +82,6 @@ export class InputManager {
             this.onSlide?.();
           }
         }
-
-        // RESET ANCHOR POINT: Allows immediate further chained gestures
-        // (e.g. swipe right then immediately swipe up to jump without lifting finger!)
-        this.touchStartX = t.clientX;
-        this.touchStartY = t.clientY;
       }
     };
 
@@ -90,14 +89,13 @@ export class InputManager {
       const now = performance.now();
       const dt = now - this.touchStartTime;
 
-      if (e.changedTouches.length > 0) {
+      if (!this.hasTriggeredSwipe && e.changedTouches.length > 0) {
         const t = e.changedTouches[0];
         const dist = Math.hypot(t.clientX - this.touchStartX, t.clientY - this.touchStartY);
 
         // Quick clean tap detection
         if (dt < 280 && dist < 18) {
           if (now - this.lastTapTime < 320) {
-            // Double Tap -> Activate Divine Mode
             this.onActivateDivine?.();
             this.lastTapTime = 0;
           } else {
@@ -108,19 +106,21 @@ export class InputManager {
       }
 
       this.isSwiping = false;
+      this.hasTriggeredSwipe = false;
     };
 
-    // Attach to window and canvas with passive: false to enable preventDefault
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', () => { this.isSwiping = false; }, { passive: true });
+    window.addEventListener('touchcancel', () => { 
+      this.isSwiping = false; 
+      this.hasTriggeredSwipe = false; 
+    }, { passive: true });
   }
 
-  // --- Mouse Drag / Swipe (for Laptop users with trackpad/mouse) ---
+  // --- Mouse Drag / Swipe (for Laptop users) ---
   initMouse() {
     window.addEventListener('mousedown', (e) => {
-      // Don't intercept clicks on interactive buttons
       if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'INPUT') {
         return;
       }
@@ -128,11 +128,12 @@ export class InputManager {
       this.isMouseDown = true;
       this.mouseStartX = e.clientX;
       this.mouseStartY = e.clientY;
+      this.hasTriggeredMouseSwipe = false;
       this.onAnyInput?.();
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (!this.isMouseDown) return;
+      if (!this.isMouseDown || this.hasTriggeredMouseSwipe) return;
 
       const dx = e.clientX - this.mouseStartX;
       const dy = e.clientY - this.mouseStartY;
@@ -140,6 +141,7 @@ export class InputManager {
       const absY = Math.abs(dy);
 
       if (Math.max(absX, absY) >= this.swipeThreshold + 4) {
+        this.hasTriggeredMouseSwipe = true;
         if (absX > absY) {
           if (dx > 0) this.onMoveRight?.();
           else this.onMoveLeft?.();
@@ -147,13 +149,12 @@ export class InputManager {
           if (dy < 0) this.onJump?.();
           else this.onSlide?.();
         }
-        this.mouseStartX = e.clientX;
-        this.mouseStartY = e.clientY;
       }
     });
 
     window.addEventListener('mouseup', () => {
       this.isMouseDown = false;
+      this.hasTriggeredMouseSwipe = false;
     });
   }
 
