@@ -320,13 +320,10 @@ export class RealisticCharacterTextures {
 
   // --- Extract Police Barricade ---
   extractPoliceBarricade(img) {
-    const tex = this.cropAndMask(img, {
-      x: 0.070,
-      y: 0.390,
-      w: 0.235,
-      h: 0.150
-    }, 4);
-    this.textures.policeBarricade = tex;
+    // Keep ultra-vivid procedural high-contrast hazard barricade for maximum visibility
+    if (!this.textures.policeBarricade) {
+      this.textures.policeBarricade = this.generateProceduralPoliceBarricade();
+    }
   }
 
   // =========================================================================
@@ -889,36 +886,60 @@ export class RealisticCharacterTextures {
 
   generateProceduralPoliceBarricade() {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 128;
+    canvas.width = 512;
+    canvas.height = 256;
     const ctx = canvas.getContext('2d');
 
-    // Red and White diagonal stripes
+    // 1. High-Visibility Reflective White Base
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 256, 128);
+    ctx.fillRect(0, 0, 512, 256);
 
-    ctx.fillStyle = '#d90429';
-    for (let x = -100; x < 350; x += 45) {
+    // 2. High-Voltage Fluorescent Safety Red Diagonal Hazard Stripes
+    ctx.fillStyle = '#ff0038';
+    for (let x = -200; x < 700; x += 70) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x + 25, 0);
-      ctx.lineTo(x - 20, 128);
-      ctx.lineTo(x - 45, 128);
+      ctx.lineTo(x + 40, 0);
+      ctx.lineTo(x - 30, 256);
+      ctx.lineTo(x - 70, 256);
       ctx.closePath();
       ctx.fill();
     }
 
-    // Blue "POLICE" center badge
-    ctx.fillStyle = '#0d3b66';
-    ctx.fillRect(38, 36, 180, 56);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(38, 36, 180, 56);
+    // 3. Top and Bottom Yellow/Black Hazard Warning Borders
+    const drawHazardBorder = (y) => {
+      ctx.fillStyle = '#ffea00';
+      ctx.fillRect(0, y, 512, 24);
+      ctx.fillStyle = '#111111';
+      for (let bx = -20; bx < 540; bx += 36) {
+        ctx.beginPath();
+        ctx.moveTo(bx, y);
+        ctx.lineTo(bx + 18, y);
+        ctx.lineTo(bx + 8, y + 24);
+        ctx.lineTo(bx - 10, y + 24);
+        ctx.closePath();
+        ctx.fill();
+      }
+    };
+    drawHazardBorder(0);
+    drawHazardBorder(232);
+
+    // 4. Center Bold High-Contrast "POLICE - STOP" Emblem
+    ctx.fillStyle = '#0a2540';
+    ctx.fillRect(66, 56, 380, 144);
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(66, 56, 380, 144);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '900 30px "Arial Black", sans-serif';
+    ctx.font = '900 52px "Arial Black", Impact, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('POLICE', 128, 76);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('POLICE', 256, 108);
+
+    ctx.fillStyle = '#ffea00';
+    ctx.font = '900 26px "Arial Black", sans-serif';
+    ctx.fillText('⚠ DANGER / JUMP ⚠', 256, 160);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
