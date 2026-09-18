@@ -30,61 +30,190 @@ export class ObstacleManager {
   }
 
   initMaterials() {
-    this.woodMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.85 });
-    this.brassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.7, roughness: 0.3 });
-    this.fabricMat = new THREE.MeshStandardMaterial({ color: 0xbc3908, roughness: 0.6 });
-    this.marigoldMat = new THREE.MeshStandardMaterial({ color: 0xff8500, roughness: 0.5 });
-    this.stoneMat = new THREE.MeshStandardMaterial({ color: 0x5c504d, roughness: 0.8 });
+    // Ultra-High Visibility Materials with Self-Illumination (Emissive)
+    // Ensures obstacles stand out vividly against dark track ballast, stone sleepers, and dusk fog
+    this.woodMat = new THREE.MeshStandardMaterial({
+      color: 0x9c3d14,
+      emissive: 0x361204,
+      roughness: 0.6
+    });
+    this.brassMat = new THREE.MeshStandardMaterial({
+      color: 0xffb703, // Radiant royal temple gold
+      emissive: 0x4a3200,
+      metalness: 0.8,
+      roughness: 0.2
+    });
+    this.fabricMat = new THREE.MeshStandardMaterial({
+      color: 0xff0055, // Vivid festival crimson
+      emissive: 0x55001c,
+      roughness: 0.4
+    });
+    this.marigoldMat = new THREE.MeshStandardMaterial({
+      color: 0xff9100, // Glowing marigold orange
+      emissive: 0x5a2d00,
+      roughness: 0.3
+    });
+    this.marigoldYellowMat = new THREE.MeshStandardMaterial({
+      color: 0xffea00, // Glowing marigold yellow
+      emissive: 0x443a00,
+      roughness: 0.3
+    });
+    this.stoneMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8, // Clean bright stone
+      roughness: 0.7
+    });
 
-    // Blue Train Materials (Indian Railways Blue & Yellow)
-    this.trainBlueMat = new THREE.MeshStandardMaterial({ color: 0x184e8e, roughness: 0.35, metalness: 0.35 });
-    this.trainYellowMat = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.3 });
-    this.trainRoofMat = new THREE.MeshStandardMaterial({ color: 0x242836, roughness: 0.6 });
-    this.trainLightMat = new THREE.MeshBasicMaterial({ color: 0xfffae0 });
-    this.trainWheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.3 });
+    // Blue Train Materials (Electric Royal Blue & High-Vis Hazard Yellow)
+    this.trainBlueMat = new THREE.MeshStandardMaterial({
+      color: 0x0066ff, // Punchy electric royal blue
+      emissive: 0x002466,
+      roughness: 0.28,
+      metalness: 0.4
+    });
+    this.trainYellowMat = new THREE.MeshStandardMaterial({
+      color: 0xffea00, // Ultra-vivid safety hazard yellow
+      emissive: 0x443c00,
+      roughness: 0.25
+    });
+    this.trainRoofMat = new THREE.MeshStandardMaterial({
+      color: 0x3d4b64, // Bright steel slate grey
+      roughness: 0.5,
+      metalness: 0.3
+    });
+    this.trainLightMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff // Pure bright Xenon white
+    });
+    this.trainLightHaloMat = new THREE.MeshBasicMaterial({
+      color: 0xffea00, // Radiant yellow beam halo
+      transparent: true,
+      opacity: 0.85
+    });
+    this.trainSirenRed = new THREE.MeshBasicMaterial({
+      color: 0xff0044 // Flashing emergency cab beacon
+    });
+    this.trainWheelMat = new THREE.MeshStandardMaterial({
+      color: 0x212529,
+      metalness: 0.8,
+      roughness: 0.3
+    });
 
-    // Red/White Barricade Materials
-    this.barricadeRedMat = new THREE.MeshStandardMaterial({ color: 0xd90429, roughness: 0.5 });
-    this.barricadeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8f9fa, roughness: 0.5 });
-    this.concreteMat = new THREE.MeshStandardMaterial({ color: 0x6c757d, roughness: 0.9 });
+    // Barricade Materials (Neon Safety Orange, Hazard Red & Amber Strobes)
+    this.barricadeRedMat = new THREE.MeshStandardMaterial({
+      color: 0xff0038,
+      emissive: 0x440010,
+      roughness: 0.4
+    });
+    this.barricadeWhiteMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x222222,
+      roughness: 0.3
+    });
+    this.barricadeOrangeMat = new THREE.MeshStandardMaterial({
+      color: 0xff5500, // High-vis traffic neon orange
+      emissive: 0x441400,
+      roughness: 0.35
+    });
+    this.concreteMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8,
+      roughness: 0.8
+    });
+    this.beaconAmberMat = new THREE.MeshBasicMaterial({
+      color: 0xffaa00 // Amber warning strobe
+    });
 
-    // Auto Rickshaw & Vehicle Materials
-    this.autoGreenMat = new THREE.MeshStandardMaterial({ color: 0x007f5f, roughness: 0.4 });
-    this.autoYellowMat = new THREE.MeshStandardMaterial({ color: 0xffd000, roughness: 0.4 });
-    this.autoBlackMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
-    this.windshieldMat = new THREE.MeshStandardMaterial({ color: 0x8ecae6, roughness: 0.1, transparent: true, opacity: 0.7 });
-    this.headlightMat = new THREE.MeshBasicMaterial({ color: 0xfffae0 });
+    // Auto Rickshaw & Vehicle Materials (Vivid Indian Kelly Green & Sunshine Yellow)
+    this.autoGreenMat = new THREE.MeshStandardMaterial({
+      color: 0x00c853, // Ultra-vivid Kelly Green
+      emissive: 0x003816,
+      roughness: 0.35
+    });
+    this.autoYellowMat = new THREE.MeshStandardMaterial({
+      color: 0xffd600, // Punchy bright sunshine yellow
+      emissive: 0x403400,
+      roughness: 0.3
+    });
+    this.autoBlackMat = new THREE.MeshStandardMaterial({
+      color: 0x212529,
+      roughness: 0.5
+    });
+    this.windshieldMat = new THREE.MeshStandardMaterial({
+      color: 0x90e0ef,
+      roughness: 0.1,
+      transparent: true,
+      opacity: 0.75
+    });
+    this.headlightMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    });
+    this.taillightRedMat = new THREE.MeshBasicMaterial({
+      color: 0xff073a
+    });
+    this.tempoOrangeMat = new THREE.MeshStandardMaterial({
+      color: 0xff6d00, // High-vis delivery orange
+      emissive: 0x441b00,
+      roughness: 0.35
+    });
+    this.gemCyanMat = new THREE.MeshBasicMaterial({
+      color: 0x00f5d4 // Glowing jump target cyan gem
+    });
   }
 
   createAutoRickshawMesh() {
     const group = new THREE.Group();
 
-    // Lower Green Body
+    // 1. Lower Body - Ultra-Vivid Kelly Green
     const lowerGeo = new THREE.BoxGeometry(1.6, 0.7, 2.4);
     const lowerBody = new THREE.Mesh(lowerGeo, this.autoGreenMat);
     lowerBody.position.y = 0.55;
     lowerBody.castShadow = true;
     group.add(lowerBody);
 
-    // Yellow Canopy Roof
+    // 2. Front High-Visibility Hazard Bumper
+    const bumperGeo = new THREE.BoxGeometry(1.65, 0.16, 0.12);
+    const bumper = new THREE.Mesh(bumperGeo, this.trainYellowMat);
+    bumper.position.set(0, 0.26, 1.22);
+    group.add(bumper);
+
+    // 3. Yellow Canopy Roof - Sunshine Yellow with overhang
     const roofGeo = new THREE.BoxGeometry(1.5, 0.75, 2.2);
     const roof = new THREE.Mesh(roofGeo, this.autoYellowMat);
     roof.position.set(0, 1.25, -0.1);
     group.add(roof);
 
-    // Windshield
+    // 4. Amber Roof Taxi Indicator Light
+    const taxiLightGeo = new THREE.BoxGeometry(0.35, 0.14, 0.2);
+    const taxiLight = new THREE.Mesh(taxiLightGeo, this.beaconAmberMat);
+    taxiLight.position.set(0, 1.68, 0.2);
+    group.add(taxiLight);
+
+    // 5. Windshield
     const glassGeo = new THREE.PlaneGeometry(1.3, 0.65);
     const glass = new THREE.Mesh(glassGeo, this.windshieldMat);
     glass.position.set(0, 1.25, 1.01);
     group.add(glass);
 
-    // Headlight
-    const lightGeo = new THREE.CircleGeometry(0.16, 12);
-    const headlight = new THREE.Mesh(lightGeo, this.headlightMat);
-    headlight.position.set(0, 0.6, 1.21);
-    group.add(headlight);
+    // 6. Dual Intense Xenon Headlights with Golden Bezels
+    for (let hx of [-0.45, 0.45]) {
+      const bezelGeo = new THREE.CircleGeometry(0.18, 12);
+      const bezel = new THREE.Mesh(bezelGeo, this.brassMat);
+      bezel.position.set(hx, 0.62, 1.21);
+      group.add(bezel);
 
-    // Wheels (3 wheels)
+      const lightGeo = new THREE.CircleGeometry(0.14, 12);
+      const headlight = new THREE.Mesh(lightGeo, this.headlightMat);
+      headlight.position.set(hx, 0.62, 1.22);
+      group.add(headlight);
+    }
+
+    // 7. Rear Glowing Red Brake Lights
+    for (let rx of [-0.65, 0.65]) {
+      const tailGeo = new THREE.BoxGeometry(0.2, 0.12, 0.05);
+      const taillight = new THREE.Mesh(tailGeo, this.taillightRedMat);
+      taillight.position.set(rx, 0.55, -1.21);
+      group.add(taillight);
+    }
+
+    // 8. 3 Black Rubber Wheels
     const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.18, 12);
     wheelGeo.rotateZ(Math.PI / 2);
 
@@ -106,26 +235,44 @@ export class ObstacleManager {
   createTempoVanMesh() {
     const group = new THREE.Group();
 
-    // Cab
+    // 1. High-Vis Safety Orange Cab
     const cabGeo = new THREE.BoxGeometry(1.7, 1.1, 1.2);
-    const cab = new THREE.Mesh(cabGeo, this.autoYellowMat);
+    const cab = new THREE.Mesh(cabGeo, this.tempoOrangeMat);
     cab.position.set(0, 0.8, 0.9);
     cab.castShadow = true;
     group.add(cab);
 
-    // Cargo Box
+    // 2. High-Vis Sunshine Yellow Cargo Box with Hazard Trim
     const boxGeo = new THREE.BoxGeometry(1.8, 1.4, 2.2);
-    const box = new THREE.Mesh(boxGeo, this.autoGreenMat);
+    const box = new THREE.Mesh(boxGeo, this.autoYellowMat);
     box.position.set(0, 1.0, -0.7);
     box.castShadow = true;
     group.add(box);
 
-    // Windshield
+    // Red hazard chevron stripe on cargo sides
+    const stripeGeo = new THREE.BoxGeometry(1.82, 0.2, 2.22);
+    const stripe = new THREE.Mesh(stripeGeo, this.barricadeRedMat);
+    stripe.position.set(0, 0.85, -0.7);
+    group.add(stripe);
+
+    // 3. Windshield
     const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.5), this.windshieldMat);
     glass.position.set(0, 0.95, 1.51);
     group.add(glass);
 
-    // Wheels (4 wheels)
+    // 4. Glowing Headlights & Cab Clearance Lights
+    for (let x of [-0.6, 0.6]) {
+      const light = new THREE.Mesh(new THREE.CircleGeometry(0.16, 12), this.headlightMat);
+      light.position.set(x, 0.55, 1.51);
+      group.add(light);
+    }
+    for (let cx of [-0.6, 0, 0.6]) {
+      const clr = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.08), this.beaconAmberMat);
+      clr.position.set(cx, 1.38, 1.35);
+      group.add(clr);
+    }
+
+    // 5. Wheels
     const wheelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.18, 10);
     wheelGeo.rotateZ(Math.PI / 2);
     for (let x of [-0.9, 0.9]) {
@@ -148,41 +295,86 @@ export class ObstacleManager {
     frame.position.y = 0.45;
     group.add(frame);
 
-    // 2. Locomotive Body (Vibrant Indian Railways Blue)
+    // 2. High-Vis Front Safety Cowcatcher / Bumper (Safety Hazard Yellow)
+    const cowcatcherGeo = new THREE.BoxGeometry(1.88, 0.42, 0.45);
+    const cowcatcher = new THREE.Mesh(cowcatcherGeo, this.trainYellowMat);
+    cowcatcher.position.set(0, 0.32, 3.15);
+    group.add(cowcatcher);
+
+    // Cowcatcher center buffer / chevron accent
+    const bufferGeo = new THREE.BoxGeometry(0.7, 0.22, 0.48);
+    const buffer = new THREE.Mesh(bufferGeo, this.barricadeRedMat);
+    buffer.position.set(0, 0.32, 3.18);
+    group.add(buffer);
+
+    // 3. Locomotive Main Body (Vibrant Electric Royal Blue with Self-Illumination)
     const bodyGeo = new THREE.BoxGeometry(1.8, 1.7, 6.0);
     const body = new THREE.Mesh(bodyGeo, this.trainBlueMat);
     body.position.y = 1.35;
     body.castShadow = true;
     group.add(body);
 
-    // 3. Golden Yellow Trim Stripe (Running along middle of locomotive)
-    const stripeGeo = new THREE.BoxGeometry(1.82, 0.22, 6.02);
+    // 4. High-Contrast Front Yellow Warning Face
+    const frontFaceGeo = new THREE.BoxGeometry(1.82, 1.4, 0.15);
+    const frontFace = new THREE.Mesh(frontFaceGeo, this.trainYellowMat);
+    frontFace.position.set(0, 1.35, 3.01);
+    group.add(frontFace);
+
+    // 5. Golden Yellow Hazard Trim Stripes along locomotive sides
+    const stripeGeo = new THREE.BoxGeometry(1.83, 0.24, 6.02);
     const stripe = new THREE.Mesh(stripeGeo, this.trainYellowMat);
     stripe.position.y = 1.25;
     group.add(stripe);
 
-    // 4. Sloped Locomotive Cab Roof
+    // 6. Sloped Locomotive Cab Roof
     const roofGeo = new THREE.CylinderGeometry(0.92, 0.92, 6.0, 16, 1, false, 0, Math.PI);
     roofGeo.rotateZ(Math.PI / 2);
     const roof = new THREE.Mesh(roofGeo, this.trainRoofMat);
     roof.position.y = 2.2;
     group.add(roof);
 
-    // 5. Front Windshield Windows
+    // 7. Front Windshield Windows
     for (let wx of [-0.45, 0.45]) {
       const winGeo = new THREE.PlaneGeometry(0.65, 0.55);
       const win = new THREE.Mesh(winGeo, this.windshieldMat);
-      win.position.set(wx, 1.7, 3.01);
+      win.position.set(wx, 1.75, 3.09);
       group.add(win);
     }
 
-    // 6. Glowing Circular Headlight (Concept art beam)
-    const lightGeo = new THREE.CircleGeometry(0.25, 16);
-    const light = new THREE.Mesh(lightGeo, this.trainLightMat);
-    light.position.set(0, 0.95, 3.02);
-    group.add(light);
+    // 8. DUAL High-Intensity Xenon Headlights + Yellow Halo Rings
+    for (let lx of [-0.55, 0.55]) {
+      // Outer bright halo ring
+      const haloGeo = new THREE.CircleGeometry(0.32, 16);
+      const halo = new THREE.Mesh(haloGeo, this.trainLightHaloMat);
+      halo.position.set(lx, 0.95, 3.09);
+      group.add(halo);
 
-    // 7. Steel Train Wheels (6 wheels along track)
+      // Core pure white spotlight
+      const lightGeo = new THREE.CircleGeometry(0.22, 16);
+      const light = new THREE.Mesh(lightGeo, this.trainLightMat);
+      light.position.set(lx, 0.95, 3.10);
+      group.add(light);
+    }
+
+    // 9. Center Upper High-Beam Searchlight (Top cab center)
+    const topLightHalo = new THREE.Mesh(new THREE.CircleGeometry(0.32, 16), this.trainLightHaloMat);
+    topLightHalo.position.set(0, 2.18, 3.02);
+    group.add(topLightHalo);
+
+    const topLight = new THREE.Mesh(new THREE.CircleGeometry(0.24, 16), this.trainLightMat);
+    topLight.position.set(0, 2.18, 3.03);
+    group.add(topLight);
+
+    // 10. Flashing Emergency Red Cab Beacon on Roof
+    const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 12), this.autoBlackMat);
+    beaconBase.position.set(0, 2.68, 2.2);
+    group.add(beaconBase);
+
+    const redBeacon = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.22, 12), this.trainSirenRed);
+    redBeacon.position.set(0, 2.80, 2.2);
+    group.add(redBeacon);
+
+    // 11. Steel Train Wheels (6 wheels along track)
     const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.14, 12);
     wheelGeo.rotateZ(Math.PI / 2);
     for (let x of [-0.95, 0.95]) {
@@ -199,21 +391,39 @@ export class ObstacleManager {
   createBarricadeMesh() {
     const group = new THREE.Group();
 
-    // Heavy concrete feet on left and right
+    // High-visibility Safety Neon Orange upright posts with reflective rings & amber warning strobes
     for (let x of [-0.85, 0.85]) {
-      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.35, 0.5), this.concreteMat);
+      // Concrete foot base
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.35, 0.5), this.concreteMat);
       foot.position.set(x, 0.18, 0);
       group.add(foot);
 
-      const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.75, 0.12), this.barricadeWhiteMat);
-      post.position.set(x, 0.55, 0);
+      // Neon Orange upright post
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.78, 0.14), this.barricadeOrangeMat);
+      post.position.set(x, 0.56, 0);
       group.add(post);
+
+      // Reflective white safety collar band
+      const collar = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), this.barricadeWhiteMat);
+      collar.position.set(x, 0.72, 0);
+      group.add(collar);
+
+      // Active Amber Warning Beacon Strobe atop post
+      const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.06, 10), this.autoBlackMat);
+      beaconBase.position.set(x, 0.96, 0);
+      group.add(beaconBase);
+
+      const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.16, 10), this.beaconAmberMat);
+      beacon.position.set(x, 1.05, 0);
+      group.add(beacon);
     }
 
-    // Authentic "POLICE" Warning Barrier with Red/White Diagonal Hazard Stripes
+    // High-Visibility "POLICE - DANGER / JUMP" Warning Plank with Red/White Fluorescent Stripes
     const barrierMat = new THREE.MeshStandardMaterial({
       map: characterTextures.textures.policeBarricade,
-      roughness: 0.45,
+      emissive: new THREE.Color(0x441018), // Self-illuminates so it shines through dusk fog
+      emissiveIntensity: 0.45,
+      roughness: 0.35,
       metalness: 0.1,
       side: THREE.DoubleSide
     });
@@ -222,6 +432,137 @@ export class ObstacleManager {
     plank.position.set(0, 0.65, 0);
     plank.castShadow = true;
     group.add(plank);
+
+    return group;
+  }
+
+  createToranArchMesh() {
+    const group = new THREE.Group();
+
+    // 1. Ornate Temple Gold Pillars (Ultra-high contrast against dark track ballast)
+    for (let x of [-1.3, 1.3]) {
+      // Base Plinth
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.3, 0.38), this.brassMat);
+      base.position.set(x, 0.15, 0);
+      group.add(base);
+
+      // Golden Column
+      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 3.1, 12), this.brassMat);
+      col.position.set(x, 1.7, 0);
+      group.add(col);
+
+      // Ornate Capital Crown
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.18, 0.34), this.trainYellowMat);
+      cap.position.set(x, 3.2, 0);
+      group.add(cap);
+    }
+
+    // 2. Radiant Festival Crimson / Magenta Arch Banner
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.46, 0.32), this.fabricMat);
+    beam.position.set(0, 1.95, 0);
+    group.add(beam);
+
+    // 3. Golden Trim Border Band along Arch
+    const goldTrim = new THREE.Mesh(new THREE.BoxGeometry(2.92, 0.10, 0.34), this.brassMat);
+    goldTrim.position.set(0, 1.74, 0);
+    group.add(goldTrim);
+
+    // 4. Glowing Downward Arrow / Slide Chevron Indicator (Signals player to slide under!)
+    const slideChevron = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.32, 4), this.trainYellowMat);
+    slideChevron.rotation.z = Math.PI; // Pointing downward
+    slideChevron.position.set(0, 1.92, 0.18);
+    group.add(slideChevron);
+
+    // 5. Vibrant Marigold Tassels Hanging Down
+    for (let fx = -1.1; fx <= 1.1; fx += 0.44) {
+      const tasselMat = (Math.abs(fx) < 0.3) ? this.marigoldYellowMat : this.marigoldMat;
+      const tassel = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.48, 8), tasselMat);
+      tassel.rotation.x = Math.PI;
+      tassel.position.set(fx, 1.5, 0);
+      group.add(tassel);
+    }
+
+    return group;
+  }
+
+  createChestMesh() {
+    const group = new THREE.Group();
+
+    // 1. Royal Crimson Velvet Body with Gold Trim
+    const chest = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.62, 1.1), this.fabricMat);
+    chest.position.y = 0.31;
+    chest.castShadow = true;
+    group.add(chest);
+
+    // 2. Gleaming Temple Gold Braces & Corner Edge Bands
+    const goldBands = new THREE.Mesh(new THREE.BoxGeometry(1.64, 0.64, 0.22), this.brassMat);
+    goldBands.position.y = 0.31;
+    group.add(goldBands);
+
+    // 3. Curved Gold Lid
+    const lidGeo = new THREE.CylinderGeometry(0.55, 0.55, 1.62, 14, 1, false, 0, Math.PI);
+    lidGeo.rotateZ(Math.PI / 2);
+    const lid = new THREE.Mesh(lidGeo, this.brassMat);
+    lid.position.set(0, 0.62, 0);
+    group.add(lid);
+
+    // 4. Radiant Neon Cyan Glowing Gem / Lock (Acts as Jump Target Beacon!)
+    const lock = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.12), this.gemCyanMat);
+    lock.position.set(0, 0.38, 0.56);
+    group.add(lock);
+
+    return group;
+  }
+
+  createCartMesh() {
+    const group = new THREE.Group();
+
+    // 1. Rich Auburn Wooden Cart Base
+    const cartBase = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.42, 1.6), this.woodMat);
+    cartBase.position.y = 0.45;
+    cartBase.castShadow = true;
+    group.add(cartBase);
+
+    // 2. Vivid Festive Vermillion Red Side Panels
+    const sidePanels = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.32, 1.62), this.barricadeRedMat);
+    sidePanels.position.y = 0.72;
+    group.add(sidePanels);
+
+    // 3. Four Golden Brass Corner Canopy Poles
+    for (let px of [-0.8, 0.8]) {
+      for (let pz of [-0.7, 0.7]) {
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.1, 8), this.brassMat);
+        pole.position.set(px, 1.35, pz);
+        group.add(pole);
+      }
+    }
+
+    // 4. Vibrant Red & Safety Yellow Striped Canopy Awning
+    const awning = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.14, 1.7), this.trainYellowMat);
+    awning.position.set(0, 1.9, 0);
+    group.add(awning);
+
+    const awningTrim = new THREE.Mesh(new THREE.BoxGeometry(1.92, 0.08, 1.72), this.fabricMat);
+    awningTrim.position.set(0, 1.83, 0);
+    group.add(awningTrim);
+
+    // 5. Piles of Glowing Golden Marigolds & Fruits
+    for (let mx of [-0.4, 0.4]) {
+      for (let mz of [-0.3, 0.3]) {
+        const flowerPile = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), this.marigoldMat);
+        flowerPile.position.set(mx, 0.95, mz);
+        group.add(flowerPile);
+      }
+    }
+
+    // 6. Two Large Wooden Wheels with Brass Rims
+    const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.12, 14);
+    wheelGeo.rotateZ(Math.PI / 2);
+    for (let wx of [-0.96, 0.96]) {
+      const wheel = new THREE.Mesh(wheelGeo, this.brassMat);
+      wheel.position.set(wx, 0.42, 0);
+      group.add(wheel);
+    }
 
     return group;
   }
@@ -266,15 +607,17 @@ export class ObstacleManager {
         this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
         this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[1], z, false);
       } else if (combo < 0.65) {
-        // Combo B: Moving Auto-Rickshaw on 1 lane + Slide Toran Arch or Jump Chest on 2nd lane!
+        // Combo B: Moving Auto-Rickshaw/Tempo on 1 lane + Slide Toran Arch or Jump Chest on 2nd lane!
+        const vehType = Math.random() > 0.4 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
         const isMoving = Math.random() > 0.3;
-        this.spawnSingleObstacle(OBSTACLE_TYPES.AUTO_RICKSHAW, blockedLanes[0], z, isMoving);
+        this.spawnSingleObstacle(vehType, blockedLanes[0], z, isMoving);
         const secondType = Math.random() > 0.5 ? OBSTACLE_TYPES.TORAN_ARCH : OBSTACLE_TYPES.CHEST_JUMP;
         this.spawnSingleObstacle(secondType, blockedLanes[1], z, false);
       } else if (combo < 0.85) {
-        // Combo C: Double Moving Vehicles (1 locomotive train + 1 auto-rickshaw staggered)
+        // Combo C: Double Moving Vehicles (1 locomotive train + 1 auto/tempo staggered)
+        const vehType = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
         this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
-        this.spawnSingleObstacle(OBSTACLE_TYPES.AUTO_RICKSHAW, blockedLanes[1], z + 6, true);
+        this.spawnSingleObstacle(vehType, blockedLanes[1], z + 6, true);
       } else {
         // Combo D: Double Jump Barricades across 2 lanes
         this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[0], z, false);
@@ -289,10 +632,11 @@ export class ObstacleManager {
       }
     } else {
       // 1 LANE BLOCKED by high-speed oncoming train or moving vehicle
-      if (patternType < 0.50) {
+      if (patternType < 0.45) {
         this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
-      } else if (patternType < 0.80) {
-        this.spawnSingleObstacle(OBSTACLE_TYPES.AUTO_RICKSHAW, blockedLanes[0], z, true);
+      } else if (patternType < 0.75) {
+        const vehType = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
+        this.spawnSingleObstacle(vehType, blockedLanes[0], z, true);
       } else {
         this.spawnSingleObstacle(OBSTACLE_TYPES.CART, blockedLanes[0], z, false);
       }
@@ -339,24 +683,20 @@ export class ObstacleManager {
         minZ: z - 1.3, maxZ: z + 1.3,
         action: 'dodge'
       };
+    } else if (type === OBSTACLE_TYPES.TEMPO_VAN) {
+      const vanMesh = this.createTempoVanMesh();
+      vanMesh.rotation.y = Math.PI; // Facing oncoming player
+      group.add(vanMesh);
+
+      bounds = {
+        minX: x - 0.95, maxX: x + 0.95,
+        minY: 0, maxY: 2.0,
+        minZ: z - 1.6, maxZ: z + 1.6,
+        action: 'dodge'
+      };
     } else if (type === OBSTACLE_TYPES.TORAN_ARCH) {
-      const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3.2, 8), this.woodMat);
-      p1.position.set(-1.3, 1.6, 0);
-      group.add(p1);
-      const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3.2, 8), this.woodMat);
-      p2.position.set(1.3, 1.6, 0);
-      group.add(p2);
-
-      const beam = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.4, 0.3), this.fabricMat);
-      beam.position.set(0, 1.9, 0);
-      group.add(beam);
-
-      for (let fx = -1.1; fx <= 1.1; fx += 0.55) {
-        const tassel = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.5, 6), this.marigoldMat);
-        tassel.rotation.x = Math.PI;
-        tassel.position.set(fx, 1.45, 0);
-        group.add(tassel);
-      }
+      const archMesh = this.createToranArchMesh();
+      group.add(archMesh);
 
       bounds = {
         minX: x - 1.2, maxX: x + 1.2,
@@ -365,10 +705,8 @@ export class ObstacleManager {
         action: 'slide'
       };
     } else if (type === OBSTACLE_TYPES.CHEST_JUMP) {
-      const chest = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.65, 1.2), this.brassMat);
-      chest.position.y = 0.32;
-      chest.castShadow = true;
-      group.add(chest);
+      const chestMesh = this.createChestMesh();
+      group.add(chestMesh);
 
       bounds = {
         minX: x - 0.85, maxX: x + 0.85,
@@ -377,10 +715,8 @@ export class ObstacleManager {
         action: 'jump'
       };
     } else {
-      const cartBase = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.9, 1.6), this.woodMat);
-      cartBase.position.y = 0.55;
-      cartBase.castShadow = true;
-      group.add(cartBase);
+      const cartMesh = this.createCartMesh();
+      group.add(cartMesh);
 
       bounds = {
         minX: x - 1.0, maxX: x + 1.0,
@@ -405,6 +741,11 @@ export class ObstacleManager {
     } else {
       this.runTime += delta;
     }
+
+    // Flash warning beacons & emergency siren lights
+    const flash = (Math.sin(this.runTime * 14) > 0);
+    this.beaconAmberMat.color.setHex(flash ? 0xffea00 : 0xff7700);
+    this.trainSirenRed.color.setHex(flash ? 0xff0044 : 0x770011);
 
     // Dynamic wave generation:
     // First 20s: 32m to 38m gentle spacing (warmup)
@@ -433,8 +774,9 @@ export class ObstacleManager {
       if (obs.isMoving && obs.active) {
         obs.z += obs.moveSpeed * delta; // Drives towards player (+Z)
         obs.group.position.z = obs.z;
-        obs.bounds.minZ = obs.z - 1.3;
-        obs.bounds.maxZ = obs.z + 1.3;
+        const halfZ = (obs.type === OBSTACLE_TYPES.BLUE_TRAIN) ? 3.1 : (obs.type === OBSTACLE_TYPES.TEMPO_VAN ? 1.6 : 1.3);
+        obs.bounds.minZ = obs.z - halfZ;
+        obs.bounds.maxZ = obs.z + halfZ;
 
         // Honk horn if within 25m of player
         if (!obs.hasHonked && Math.abs(obs.z - playerZ) < 26) {
