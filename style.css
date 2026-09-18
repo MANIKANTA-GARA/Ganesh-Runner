@@ -756,6 +756,75 @@ h1.title-gold {
   transform: scale(0.94);
 }
 
+/* Creator Watermark Styles (Created by Manikanta Gara (NIAT x NSRIT)) */
+.creator-watermark-pill {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #ffd7a8;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  width: 100%;
+}
+
+.creator-watermark-pill strong {
+  color: #ffd700;
+  font-weight: 900;
+}
+
+.creator-watermark-pill .watermark-org {
+  color: #ff9e00;
+  font-weight: 800;
+}
+
+.creator-watermark-subtle {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffd7a8;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  text-align: center;
+}
+
+.creator-watermark-subtle strong {
+  color: #ffd700;
+  font-weight: 900;
+}
+
+.hud-in-game-watermark {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: rgba(255, 215, 0, 0.8);
+  background: rgba(10, 6, 18, 0.7);
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  pointer-events: none;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  z-index: 5;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.hud-in-game-watermark strong {
+  color: #ffd700;
+  font-weight: 800;
+}
+
 /* Mobile Screen Tuning for Subway Surfers Touch Controls */
 @media (max-width: 600px) {
   .main-logo {
@@ -847,6 +916,20 @@ h1.title-gold {
   .powerup-chip {
     padding: 3px 6px;
     font-size: 0.68rem;
+  }
+  .creator-watermark-pill {
+    font-size: 0.74rem;
+    padding: 6px 12px;
+    margin-top: 10px;
+  }
+  .creator-watermark-subtle {
+    font-size: 0.72rem;
+    margin-top: 10px;
+  }
+  .hud-in-game-watermark {
+    font-size: 0.62rem;
+    padding: 2px 8px;
+    bottom: 3px;
   }
 }
 
