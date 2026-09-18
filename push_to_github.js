@@ -6,6 +6,9 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
+import https from 'https';
+import os from 'os';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,19 +44,43 @@ async function main() {
     process.exit(1);
   }
 
-  const headers = {
-    'Authorization': `Bearer ${token}`,
-    'User-Agent': 'Ganesha-Runner-Deployer',
-    'Accept': 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json'
-  };
+  function apiRequest(urlStr, method = 'GET', body = null) {
+    const tempFile = path.join(os.tmpdir(), `gh_req_${Date.now()}_${Math.random().toString(36).slice(2)}.json`);
+    const args = [
+      '-s',
+      '-L',
+      '--max-time', '60',
+      '-X', method,
+      '-H', `Authorization: token ${token}`,
+      '-H', 'User-Agent: Ganesha-Runner-Deployer',
+      '-H', 'Accept: application/vnd.github.v3+json'
+    ];
 
-  async function apiRequest(url, method = 'GET', body = null) {
-    const options = { method, headers };
-    if (body) options.body = JSON.stringify(body);
-    const res = await fetch(url, options);
-    const data = await res.json().catch(() => ({}));
-    return { status: res.status, ok: res.ok, data };
+    if (body) {
+      fs.writeFileSync(tempFile, JSON.stringify(body));
+      args.push('-H', 'Content-Type: application/json');
+      args.push('--data-binary', `@${tempFile}`);
+    }
+
+    args.push('-w', '\n%{http_code}');
+    args.push(urlStr);
+
+    try {
+      const output = execFileSync('curl.exe', args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
+      const lastNewline = output.lastIndexOf('\n');
+      const bodyStr = (lastNewline !== -1) ? output.substring(0, lastNewline) : output;
+      const codeStr = (lastNewline !== -1) ? output.substring(lastNewline + 1).trim() : '200';
+      const status = parseInt(codeStr, 10) || 200;
+      let data = {};
+      try { data = JSON.parse(bodyStr); } catch (e) { data = bodyStr; }
+      return { status, ok: status >= 200 && status < 300, data };
+    } catch (err) {
+      return { status: 0, ok: false, data: { message: err.message } };
+    } finally {
+      if (body && fs.existsSync(tempFile)) {
+        try { fs.unlinkSync(tempFile); } catch (e) {}
+      }
+    }
   }
 
   // 1. Authenticate user
