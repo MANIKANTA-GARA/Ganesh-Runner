@@ -109,6 +109,17 @@ export class Game {
     this.environment.onThemeChange = (theme, weather) => {
       this.ui?.showLocationBanner(theme, weather);
     };
+
+    // Restore saved theme & weather preferences from Main Menu selection
+    const savedTheme = localStorage.getItem('ganesh_selected_theme');
+    const savedWeather = localStorage.getItem('ganesh_selected_weather');
+    if (savedTheme && savedTheme !== 'AUTO') {
+      this.environment.setThemeMode('MANUAL', savedTheme);
+    }
+    if (savedWeather && savedWeather !== 'AUTO') {
+      this.environment.setWeatherMode('MANUAL', savedWeather);
+    }
+
     this.environment.initWorld();
     this.obstacles = new ObstacleManager(this.scene, this.particles, this.sound);
     this.collectibles = new CollectibleManager(this.scene, this.particles, this.sound);
@@ -236,6 +247,24 @@ export class Game {
     this.camera.lookAt(0, 1.3, 0);
   }
 
+  setManualTheme(themeId) {
+    if (!this.environment) return;
+    if (themeId === 'AUTO') {
+      this.environment.setThemeMode('AUTO');
+    } else {
+      this.environment.setThemeMode('MANUAL', themeId);
+    }
+  }
+
+  setManualWeather(weatherId) {
+    if (!this.environment) return;
+    if (weatherId === 'AUTO') {
+      this.environment.setWeatherMode('AUTO');
+    } else {
+      this.environment.setWeatherMode('MANUAL', weatherId);
+    }
+  }
+
   startRun() {
     this.resetRun();
     this.ganesha.setFrontFacing(false);
@@ -361,6 +390,27 @@ export class Game {
 
     this.ganesha.update(delta, 0.4);
     this.particles.update(delta);
+
+    // Keep ambient crowds and clouds alive during menu preview
+    if (this.environment) {
+      if (this.environment.cloudGroup) {
+        this.environment.cloudGroup.children.forEach(c => {
+          c.position.x += delta * 1.8;
+          if (c.position.x > 140) c.position.x = -140;
+        });
+      }
+      const crowdTime = Date.now() * 0.001;
+      for (let i = 0; i < this.environment.activeCrowdFigures.length; i++) {
+        const fig = this.environment.activeCrowdFigures[i];
+        if (fig.userData && fig.userData.waveArm) {
+          const arm = fig.userData.waveArm;
+          const baseRot = fig.userData.initialRotZ;
+          const phase = fig.userData.animPhase;
+          const speed = fig.userData.animSpeed;
+          arm.rotation.z = baseRot + Math.sin(crowdTime * speed + phase) * 0.22;
+        }
+      }
+    }
   }
 
   updatePlaying(delta) {
