@@ -47,6 +47,7 @@ export class UIManager {
     this.bindEvents();
     this.initTargetBadge();
     this.initThemePreferences();
+    this.initAvatarPreferences();
   }
 
   initTargetBadge() {
@@ -62,6 +63,17 @@ export class UIManager {
     };
     drawBadge();
     characterTextures.onReady(() => drawBadge());
+  }
+
+  initAvatarPreferences() {
+    const savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
+    document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(card => {
+      if (card.dataset.avatar === savedAvatar) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
   }
 
   initThemePreferences() {
@@ -109,7 +121,20 @@ export class UIManager {
 
     document.getElementById('menu-characters-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
+      this.initAvatarPreferences();
       this.screens.characters?.classList.remove('hidden');
+    });
+
+    // 3D Playable Avatar Card Selection
+    document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(c => c.classList.remove('active'));
+        const el = e.currentTarget;
+        el.classList.add('active');
+        const avatarId = el.dataset.avatar;
+        localStorage.setItem('ganesh_selected_avatar', avatarId);
+        this.game?.setAvatar(avatarId);
+      });
     });
 
     document.getElementById('menu-settings-btn')?.addEventListener('click', (e) => {
