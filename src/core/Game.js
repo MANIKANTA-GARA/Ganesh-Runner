@@ -120,6 +120,10 @@ export class Game {
       this.environment.setWeatherMode('MANUAL', savedWeather);
     }
 
+    // Restore saved avatar preference
+    const savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
+    this.ganesha.setAvatar(savedAvatar);
+
     this.environment.initWorld();
     this.collectibles = new CollectibleManager(this.scene, this.particles, this.sound);
     this.obstacles = new ObstacleManager(this.scene, this.particles, this.sound, this.collectibles);
@@ -262,6 +266,12 @@ export class Game {
       this.environment.setWeatherMode('AUTO');
     } else {
       this.environment.setWeatherMode('MANUAL', weatherId);
+    }
+  }
+
+  setAvatar(avatarId) {
+    if (this.ganesha) {
+      this.ganesha.setAvatar(avatarId);
     }
   }
 
