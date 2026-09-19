@@ -416,7 +416,7 @@ export class ObstacleManager {
     return bogie;
   }
 
-  createLocomotiveMesh() {
+  createLocomotiveMesh(isMoving = true) {
     const group = new THREE.Group();
 
     // 1. Heavy Underbody Chassis Deck (8.8m length, 1.82m width)
@@ -539,22 +539,26 @@ export class ObstacleManager {
       group.add(mirrorFace);
     }
 
-    // 7. CLEAN AERODYNAMIC STREAMLINED ROOF (ZERO STICKS, ZERO PANTOGRAPH)
-    const roofCurveGeo = new THREE.CylinderGeometry(0.92, 0.92, 7.8, 20, 1, false, 0, Math.PI);
-    roofCurveGeo.rotateZ(Math.PI / 2);
-    const roof = new THREE.Mesh(roofCurveGeo, this.trainRoofMat);
+    // 7. CLEAN AERODYNAMIC STREAMLINED ROOF (ZERO STICKS, ZERO CYLINDER PROTRUSIONS)
+    // Sleek flush main roof deck matching locomotive body width 1.80m and length 7.8m
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.80, 0.16, 7.8), this.trainRoofMat);
     roof.position.y = 2.48;
     group.add(roof);
 
-    // Sleek flush aerodynamic rooftop pods (low profile, no sticks)
+    // Streamlined beveled upper deck running longitudinally along the locomotive
+    const topDeck = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.08, 7.6), this.trainRoofMat);
+    topDeck.position.y = 2.58;
+    group.add(topDeck);
+
+    // Sleek flush aerodynamic rooftop pods (low profile, completely flush, no sticks)
     for (const hz of [-2.4, 0.0, 2.0]) {
-      const pod = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.16, 1.4), this.trainRoofMat);
-      pod.position.set(0, 2.58, hz);
+      const pod = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.10, 1.4), this.trainRoofMat);
+      pod.position.set(0, 2.65, hz);
       group.add(pod);
 
       // Flush cooling grille inlay
       const grille = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.02, 1.1), this.chassisMat);
-      grille.position.set(0, 2.67, hz);
+      grille.position.set(0, 2.71, hz);
       group.add(grille);
     }
 
@@ -596,13 +600,13 @@ export class ObstacleManager {
       beamCone.position.set(0, 1.25, 14.4);
       group.add(beamCone);
 
-      // Flashing Emergency Cab Strobe Dome (low profile)
-      const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.06, 10), this.autoBlackMat);
-      beaconBase.position.set(0, 2.68, 3.2);
+      // Flashing Emergency Cab Strobe Dome (low profile flush beacon)
+      const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.04, 10), this.autoBlackMat);
+      beaconBase.position.set(0, 2.64, 3.2);
       group.add(beaconBase);
 
-      const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 10), this.trainSirenRed);
-      beacon.position.set(0, 2.76, 3.2);
+      const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), this.trainSirenRed);
+      beacon.position.set(0, 2.70, 3.2);
       group.add(beacon);
     } else {
       // STANDING / PARKED TRAIN: Soft idle parking lights + twin red caution markers on buffer beam
@@ -675,17 +679,21 @@ export class ObstacleManager {
     sideR.scale.x = -1;
     group.add(sideR);
 
-    // 4. Sleek Aerodynamic Curved Roof (ZERO STICKS, ZERO PEGS, ZERO TORPEDO PROTRUSIONS)
-    const roofCurveGeo = new THREE.CylinderGeometry(0.92, 0.92, 8.8, 20, 1, false, 0, Math.PI);
-    roofCurveGeo.rotateZ(Math.PI / 2);
-    const roof = new THREE.Mesh(roofCurveGeo, this.trainRoofMat);
+    // 4. Sleek Aerodynamic Roof (ZERO STICKS, ZERO CYLINDER PROTRUSIONS)
+    // Low-profile flush main roof deck matching coach body width 1.82m and length 8.8m
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.16, 8.8), this.trainRoofMat);
     roof.position.y = 2.48;
     group.add(roof);
 
+    // Streamlined beveled upper deck running longitudinally along the coach
+    const topDeck = new THREE.Mesh(new THREE.BoxGeometry(1.54, 0.08, 8.6), this.trainRoofMat);
+    topDeck.position.y = 2.58;
+    group.add(topDeck);
+
     // Sleek flush longitudinal roof ribs (seamless corrugated texture, no sticks)
     for (const rz of [-2.4, 0, 2.4]) {
-      const rib = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.08, 1.6), this.trainRoofMat);
-      rib.position.set(0, 2.52, rz);
+      const rib = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 1.6), this.trainRoofMat);
+      rib.position.set(0, 2.64, rz);
       group.add(rib);
     }
 
