@@ -387,4 +387,29 @@ export class UIManager {
       tbody.appendChild(tr);
     });
   }
+
+  showLocationBanner(theme, weather) {
+    const banner = document.getElementById('hud-location-banner');
+    const iconEl = document.getElementById('hud-loc-icon');
+    const titleEl = document.getElementById('hud-loc-title');
+    const subEl = document.getElementById('hud-loc-sub');
+
+    if (!banner || !titleEl || !theme || !weather) return;
+
+    if (iconEl) iconEl.textContent = theme.icon || '📍';
+    titleEl.textContent = (theme.name || 'TEMPLE REGION').toUpperCase();
+    if (subEl) subEl.textContent = `${theme.subtitle || ''} • ${weather.icon || ''} ${weather.name || ''}`;
+
+    banner.classList.remove('hidden');
+
+    // Reset animation by removing and re-adding
+    banner.style.animation = 'none';
+    void banner.offsetWidth; // trigger DOM reflow
+    banner.style.animation = '';
+
+    if (this._bannerTimeout) clearTimeout(this._bannerTimeout);
+    this._bannerTimeout = setTimeout(() => {
+      banner.classList.add('hidden');
+    }, 3200);
+  }
 }
