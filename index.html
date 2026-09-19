@@ -44,6 +44,7 @@
         <div class="start-footer-row">
           <div id="menu-highscore-badge" class="badge-highscore">BEST: 0</div>
           <div style="display: flex; gap: 8px;">
+            <button id="menu-themes-btn" class="btn-micro" title="Select Theme">🎨 THEMES</button>
             <button id="menu-characters-btn" class="btn-micro" title="Select Avatar">👘 AVATARS</button>
             <button id="menu-settings-btn" class="btn-micro" title="Settings">⚙ SETTINGS</button>
           </div>
@@ -244,6 +245,105 @@
               <div style="font-size: 0.8rem; color: #aaa;">Pure celestial white dhoti & sapphire aura</div>
             </div>
             <span style="font-size: 1.4rem;">🏔</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Themes & Weather Selection Modal -->
+    <div id="themes-modal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-height: 88vh; overflow-y: auto;">
+        <div class="modal-header">
+          <h2 class="modal-title">🎨 WORLD THEMES & SKY</h2>
+          <button class="modal-close-btn">×</button>
+        </div>
+        <p style="font-size: 0.86rem; color: #ffd8a8; margin-bottom: 12px; line-height: 1.3;">Select your location scenery and sky atmosphere, or keep on Auto for the dynamic 30-second cycle:</p>
+
+        <div style="font-weight: 800; color: #ffd700; font-size: 0.88rem; margin-bottom: 8px; letter-spacing: 1px;">📍 LOCATION SCENERY</div>
+        <div class="theme-grid" id="location-theme-grid">
+          <div class="theme-card active" data-theme="AUTO">
+            <span class="theme-card-icon">🔄</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Dynamic Rotation</div>
+              <div class="theme-card-desc">Automatically changes location every 30 seconds</div>
+            </div>
+            <span class="theme-card-badge">AUTO</span>
+          </div>
+
+          <div class="theme-card" data-theme="RAILWAY_STATION">
+            <span class="theme-card-icon">🚉</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Ganesh Junction</div>
+              <div class="theme-card-desc">Station platforms, hazard stripes, passengers & chai stall</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-theme="BAZAAR_MARKET">
+            <span class="theme-card-icon">🛍️</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Chandni Bazaar</div>
+              <div class="theme-card-desc">Striped market canopies, fruit carts, flower stalls & vendors</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-theme="HAVELI_TOWN">
+            <span class="theme-card-icon">🏘️</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Heritage Havelis</div>
+              <div class="theme-card-desc">Traditional multi-story houses, terracotta roofs & balconies</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-theme="TEMPLE_GHATS">
+            <span class="theme-card-icon">🛕</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Sacred Temple Ghats</div>
+              <div class="theme-card-desc">Stepped gopuram towers, stone pillars & floating diyas</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-weight: 800; color: #ffd700; font-size: 0.88rem; margin: 16px 0 8px 0; letter-spacing: 1px;">☀️ SKY & TIME OF DAY</div>
+        <div class="theme-grid" id="weather-theme-grid">
+          <div class="theme-card active" data-weather="AUTO">
+            <span class="theme-card-icon">🔄</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Dynamic Day/Night Cycle</div>
+              <div class="theme-card-desc">Automatically cycles sky & lighting every 30s</div>
+            </div>
+            <span class="theme-card-badge">AUTO</span>
+          </div>
+
+          <div class="theme-card" data-weather="BRIGHT_DAY">
+            <span class="theme-card-icon">☀️</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Bright Daylight</div>
+              <div class="theme-card-desc">Azure blue sky, bright warm sunshine & crisp shadows</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-weather="CLOUDY_MIST">
+            <span class="theme-card-icon">☁️</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Misty Overcast</div>
+              <div class="theme-card-desc">Silver overcast skies, diffused light & rolling mist</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-weather="GOLDEN_SUNSET">
+            <span class="theme-card-icon">🌅</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Golden Sunset (Godhuli)</div>
+              <div class="theme-card-desc">Vibrant fiery crimson & amber twilight glow</div>
+            </div>
+          </div>
+
+          <div class="theme-card" data-weather="STARRY_NIGHT">
+            <span class="theme-card-icon">🌙</span>
+            <div class="theme-card-body">
+              <div class="theme-card-title">Starry Moonlit Night</div>
+              <div class="theme-card-desc">Midnight indigo sky, twinkling stars & crescent moon</div>
+            </div>
           </div>
         </div>
       </div>
