@@ -121,8 +121,8 @@ export class Game {
     }
 
     this.environment.initWorld();
-    this.obstacles = new ObstacleManager(this.scene, this.particles, this.sound);
     this.collectibles = new CollectibleManager(this.scene, this.particles, this.sound);
+    this.obstacles = new ObstacleManager(this.scene, this.particles, this.sound, this.collectibles);
     this.powerUps = new PowerUpManager(this.scene, this.particles, this.sound, this.ganesha);
     this.input = new InputManager();
 
