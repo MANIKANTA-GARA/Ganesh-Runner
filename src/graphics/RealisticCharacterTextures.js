@@ -1092,7 +1092,7 @@ export class RealisticCharacterTextures {
       ctx.fillRect(wx, 79, winWidth, winHeight);
 
       // Window Glass Reflection Diagonal Glare
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
       ctx.beginPath();
       ctx.moveTo(wx + 10, 79);
       ctx.lineTo(wx + 28, 79);
@@ -1100,19 +1100,9 @@ export class RealisticCharacterTextures {
       ctx.lineTo(wx - 10, 79 + winHeight);
       ctx.closePath();
       ctx.fill();
-
-      // Window security bars
-      ctx.strokeStyle = 'rgba(200, 200, 200, 0.6)';
-      ctx.lineWidth = 1.5;
-      for (let by = 98; by <= 140; by += 16) {
-        ctx.beginPath();
-        ctx.moveTo(wx, by);
-        ctx.lineTo(wx + winWidth, by);
-        ctx.stroke();
-      }
     }
 
-    // 3. Side Passenger Doors with Hazard Stripes & Chrome Handrail
+    // 3. Side Passenger Doors with Hazard Stripes
     for (let dx of [30, 930]) {
       ctx.fillStyle = '#001d4a';
       ctx.fillRect(dx, 36, 68, 195);
@@ -1123,10 +1113,6 @@ export class RealisticCharacterTextures {
       // Door window
       ctx.fillStyle = '#8ecae6';
       ctx.fillRect(dx + 16, 52, 36, 55);
-
-      // Chrome vertical boarding grab-pole
-      ctx.fillStyle = '#e0e1dd';
-      ctx.fillRect(dx + 56, 44, 4, 180);
     }
 
     // 4. Coach Destination Nameboard Banner & Road Number
