@@ -542,6 +542,37 @@ export class SoundManager {
     });
   }
 
+  playTrainHorn() {
+    if (!this.sfxEnabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    // Classic Nathan K3LA / Indian Railways WAP-7 chord: D#4 (311Hz), F#4 (370Hz), A#4 (466Hz)
+    const notes = [311.13, 370.0, 466.16];
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq + (idx === 1 ? 1.2 : -1.0), t);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(freq * 1.5, t);
+      filter.Q.setValueAtTime(3.0, t);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.28, t + 0.08);
+      gain.gain.setValueAtTime(0.25, t + 0.45);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(t);
+      osc.stop(t + 0.9);
+    });
+  }
+
   playHighScore() {
     if (!this.sfxEnabled || !this.ctx) return;
     const chords = [523.25, 659.25, 783.99, 1046.5];
