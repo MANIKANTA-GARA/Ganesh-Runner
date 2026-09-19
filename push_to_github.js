@@ -45,42 +45,44 @@ async function main() {
   }
 
   function apiRequest(urlStr, method = 'GET', body = null) {
-    const tempFile = path.join(os.tmpdir(), `gh_req_${Date.now()}_${Math.random().toString(36).slice(2)}.json`);
-    const args = [
-      '-s',
-      '-L',
-      '--max-time', '60',
-      '-X', method,
-      '-H', `Authorization: token ${token}`,
-      '-H', 'User-Agent: Ganesha-Runner-Deployer',
-      '-H', 'Accept: application/vnd.github.v3+json'
-    ];
+    return new Promise((resolve) => {
+      const u = new URL(urlStr);
+      const postData = body ? JSON.stringify(body) : null;
+      const opts = {
+        protocol: u.protocol,
+        hostname: u.hostname,
+        port: 443,
+        path: u.pathname + u.search,
+        method: method,
+        headers: {
+          'Authorization': `token ${token}`,
+          'User-Agent': 'Ganesha-Runner-Deployer',
+          'Accept': 'application/vnd.github.v3+json',
+          ...(postData ? {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          } : {})
+        }
+      };
 
-    if (body) {
-      fs.writeFileSync(tempFile, JSON.stringify(body));
-      args.push('-H', 'Content-Type: application/json');
-      args.push('--data-binary', `@${tempFile}`);
-    }
+      const req = https.request(opts, (res) => {
+        const chunks = [];
+        res.on('data', chunk => chunks.push(chunk));
+        res.on('end', () => {
+          const bodyStr = Buffer.concat(chunks).toString('utf8');
+          let data = {};
+          try { data = JSON.parse(bodyStr); } catch (e) { data = bodyStr; }
+          resolve({ status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 300, data });
+        });
+      });
 
-    args.push('-w', '\n%{http_code}');
-    args.push(urlStr);
+      req.on('error', (err) => {
+        resolve({ status: 0, ok: false, data: { message: err.message } });
+      });
 
-    try {
-      const output = execFileSync('curl.exe', args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
-      const lastNewline = output.lastIndexOf('\n');
-      const bodyStr = (lastNewline !== -1) ? output.substring(0, lastNewline) : output;
-      const codeStr = (lastNewline !== -1) ? output.substring(lastNewline + 1).trim() : '200';
-      const status = parseInt(codeStr, 10) || 200;
-      let data = {};
-      try { data = JSON.parse(bodyStr); } catch (e) { data = bodyStr; }
-      return { status, ok: status >= 200 && status < 300, data };
-    } catch (err) {
-      return { status: 0, ok: false, data: { message: err.message } };
-    } finally {
-      if (body && fs.existsSync(tempFile)) {
-        try { fs.unlinkSync(tempFile); } catch (e) {}
-      }
-    }
+      if (postData) req.write(postData);
+      req.end();
+    });
   }
 
   // 1. Authenticate user
@@ -96,8 +98,11 @@ async function main() {
   // 2. Check / Create Repository
   console.log(`\n[2/4] Checking repository "${repoName}"...`);
   let repoRes = await apiRequest(`https://api.github.com/repos/${username}/${repoName}`);
+  let defaultBranch = 'main';
   if (repoRes.ok) {
-    console.log(`  ✓ Found existing repository: ${repoRes.data.html_url}`);
+    repoName = repoRes.data.name;
+    defaultBranch = repoRes.data.default_branch || 'main';
+    console.log(`  ✓ Found existing repository: ${repoRes.data.html_url} (branch: ${defaultBranch})`);
   } else {
     console.log(`  Creating new repository "https://github.com/${username}/${repoName}"...`);
     repoRes = await apiRequest('https://api.github.com/user/repos', 'POST', {
@@ -112,6 +117,8 @@ async function main() {
       console.error(`Failed to create repository: ${repoRes.data?.message || repoRes.status}`);
       process.exit(1);
     }
+    repoName = repoRes.data.name;
+    defaultBranch = repoRes.data.default_branch || 'main';
     console.log(`  ✓ Created repository: ${repoRes.data.html_url}`);
     // Brief pause to allow GitHub to initialize branch
     await new Promise(r => setTimeout(r, 2000));
@@ -160,19 +167,19 @@ async function main() {
     const contentBuffer = await fs.promises.readFile(file.fullPath);
     const base64Content = contentBuffer.toString('base64');
 
-    // Check if file already exists to get SHA
-    const checkRes = await apiRequest(`https://api.github.com/repos/${username}/${repoName}/contents/${file.relPath}`);
-    const sha = checkRes.ok ? checkRes.data.sha : undefined;
+    // Check if file already exists on this branch to get SHA
+    const checkRes = await apiRequest(`https://api.github.com/repos/${username}/${repoName}/contents/${encodeURI(file.relPath)}?ref=${defaultBranch}`);
+    const sha = (checkRes.ok && checkRes.data && checkRes.data.sha) ? checkRes.data.sha : undefined;
 
     const body = {
-      message: `Sync: ${file.relPath}`,
+      message: `Update: ${file.relPath} (Realistic Trains & Photorealistic Ganesha)`,
       content: base64Content,
-      branch: 'main'
+      branch: defaultBranch
     };
     if (sha) body.sha = sha;
 
     const putRes = await apiRequest(
-      `https://api.github.com/repos/${username}/${repoName}/contents/${file.relPath}`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${encodeURI(file.relPath)}`,
       'PUT',
       body
     );
