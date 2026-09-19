@@ -10,6 +10,7 @@ export class GaneshaModel {
     this.root.add(this.characterGroup);
     this.scene.add(this.root);
 
+    this.selectedAvatar = 'bal_ganesha'; // 'bal_ganesha' | 'mushika_vahana'
     this.currentOutfit = 'pitambara'; // 'pitambara' | 'rudraksha' | 'kailash'
     this.materials = {};
 
@@ -38,6 +39,8 @@ export class GaneshaModel {
     // Animated running stride frames & footstep callback
     this.backFrames = characterTextures.textures.ganeshaBackFrames || [characterTextures.textures.ganeshaBack];
     this.frontFrames = characterTextures.textures.ganeshaFrontFrames || [characterTextures.textures.ganeshaFront];
+    this.mushikaBackFrames = characterTextures.textures.mushikaBackFrames || [characterTextures.textures.mushikaBack];
+    this.mushikaFrontFrames = characterTextures.textures.mushikaFrontFrames || [characterTextures.textures.mushikaFront];
     this.lastFrameIndex = -1;
     this.onFootstep = null;
 
@@ -50,10 +53,17 @@ export class GaneshaModel {
     characterTextures.onReady((textures) => {
       this.backFrames = textures.ganeshaBackFrames || [textures.ganeshaBack];
       this.frontFrames = textures.ganeshaFrontFrames || [textures.ganeshaFront];
+      this.mushikaBackFrames = textures.mushikaBackFrames || [textures.mushikaBack];
+      this.mushikaFrontFrames = textures.mushikaFrontFrames || [textures.mushikaFront];
       if (this.mainMat) {
-        const active = this.isFrontFacing ? this.frontFrames : this.backFrames;
-        if (active && active.length > 0) {
-          this.mainMat.map = active[0];
+        let activeTex;
+        if (this.selectedAvatar === 'mushika_vahana') {
+          activeTex = this.isFrontFacing ? (textures.mushikaFront || textures.ganeshaFront) : (textures.mushikaBack || textures.ganeshaBack);
+        } else {
+          activeTex = this.isFrontFacing ? textures.ganeshaFront : textures.ganeshaBack;
+        }
+        if (activeTex) {
+          this.mainMat.map = activeTex;
           this.mainMat.needsUpdate = true;
         }
       }
@@ -205,11 +215,65 @@ export class GaneshaModel {
     this.mushikaGroup.add(rightEar);
   }
 
+  setAvatar(avatarId) {
+    this.selectedAvatar = avatarId || 'bal_ganesha';
+    if (this.selectedAvatar === 'mushika_vahana') {
+      // 1. Rebuild geometry to fit wide Mushika mount (2.15m x 2.65m)
+      if (this.bodyGeo) this.bodyGeo.dispose();
+      this.bodyGeo = new THREE.PlaneGeometry(2.15, 2.65, 16, 24);
+      this.basePositions = Float32Array.from(this.bodyGeo.attributes.position.array);
+      this.bodyMesh.geometry = this.bodyGeo;
+      this.bodyMesh.position.set(0, 1.32, 0);
+
+      // Hide fluttering scarf and crown pinnacle (already rendered in photorealistic mount sheet)
+      this.scarfGroup.visible = false;
+      this.kalashaMesh.visible = false;
+      this.mushikaGroup.visible = false;
+
+      // Update texture
+      const tex = this.isFrontFacing
+        ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
+        : (characterTextures.textures.mushikaBack || characterTextures.textures.ganeshaBack);
+      if (this.mainMat && tex) {
+        this.mainMat.map = tex;
+        this.mainMat.needsUpdate = true;
+      }
+    } else {
+      // 2. Restore Bal Ganesha runner geometry (1.68m x 2.58m)
+      if (this.bodyGeo) this.bodyGeo.dispose();
+      this.bodyGeo = new THREE.PlaneGeometry(1.68, 2.58, 16, 24);
+      this.basePositions = Float32Array.from(this.bodyGeo.attributes.position.array);
+      this.bodyMesh.geometry = this.bodyGeo;
+      this.bodyMesh.position.set(0, 1.29, 0);
+
+      this.scarfGroup.visible = true;
+      this.kalashaMesh.visible = true;
+      this.mushikaGroup.visible = this.isMushikaMounted;
+
+      const tex = this.isFrontFacing
+        ? characterTextures.textures.ganeshaFront
+        : characterTextures.textures.ganeshaBack;
+      if (this.mainMat && tex) {
+        this.mainMat.map = tex;
+        this.mainMat.needsUpdate = true;
+      }
+    }
+  }
+
   setFrontFacing(facing) {
     this.isFrontFacing = facing;
-    const active = this.isFrontFacing ? this.frontFrames : this.backFrames;
-    if (this.mainMat && active && active.length > 0) {
-      this.mainMat.map = active[0];
+    let activeTex;
+    if (this.selectedAvatar === 'mushika_vahana') {
+      activeTex = this.isFrontFacing
+        ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
+        : (characterTextures.textures.mushikaBack || characterTextures.textures.ganeshaBack);
+    } else {
+      activeTex = this.isFrontFacing
+        ? characterTextures.textures.ganeshaFront
+        : characterTextures.textures.ganeshaBack;
+    }
+    if (this.mainMat && activeTex) {
+      this.mainMat.map = activeTex;
       this.mainMat.needsUpdate = true;
     }
   }
@@ -344,7 +408,14 @@ export class GaneshaModel {
 
     // Ensure pristine high-resolution texture is active (no frame-flipping jitter)
     if (this.mainMat) {
-      const activeTex = this.isFrontFacing ? characterTextures.textures.ganeshaFront : characterTextures.textures.ganeshaBack;
+      let activeTex;
+      if (this.selectedAvatar === 'mushika_vahana') {
+        activeTex = this.isFrontFacing
+          ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
+          : (characterTextures.textures.mushikaBack || characterTextures.textures.ganeshaBack);
+      } else {
+        activeTex = this.isFrontFacing ? characterTextures.textures.ganeshaFront : characterTextures.textures.ganeshaBack;
+      }
       if (activeTex && this.mainMat.map !== activeTex) {
         this.mainMat.map = activeTex;
         this.mainMat.needsUpdate = true;
@@ -380,8 +451,10 @@ export class GaneshaModel {
       this.bodyMesh.position.x = 0;
 
       // Silk scarf sweeps back in aerial slipstream
-      this.rightScarf.rotation.x = 0.65;
-      this.rightScarf.rotation.z = -0.42;
+      if (this.selectedAvatar !== 'mushika_vahana') {
+        this.rightScarf.rotation.x = 0.65;
+        this.rightScarf.rotation.z = -0.42;
+      }
 
       // Ground shadow contracts and diffuses with altitude
       const jumpShadow = Math.max(0.15, 1.0 - (jumpY / 2.8));
@@ -403,15 +476,17 @@ export class GaneshaModel {
       this.slideTime += delta * 2.1;
 
       // Low-profile center of gravity
-      this.characterGroup.position.y = -0.42;
+      this.characterGroup.position.y = (this.selectedAvatar === 'mushika_vahana') ? -0.22 : -0.42;
       this.characterGroup.rotation.x = 0.78; // Lean back slide pose
       this.characterGroup.rotation.y = 0;
       this.characterGroup.rotation.z = this.bankAngle;
       this.characterGroup.scale.set(1.10, 0.75, 1.0);
 
-      // Scarf sweeps low along the railway ballast
-      this.rightScarf.rotation.x = 0.85;
-      this.rightScarf.position.y = 0.85;
+      if (this.selectedAvatar !== 'mushika_vahana') {
+        // Scarf sweeps low along the railway ballast
+        this.rightScarf.rotation.x = 0.85;
+        this.rightScarf.position.y = 0.85;
+      }
 
       // Contact shadow broadens during slide
       this.shadowMesh.scale.set(1.45, 1.25, 1.0);
@@ -428,44 +503,64 @@ export class GaneshaModel {
     }
     // 3. Smooth, Visibly Pumping Running Legs Dynamics
     else {
-      // Articulate 3D legs and arm counter-swings in mesh grid!
-      this.animateRunningDeformation(this.runCycle, runSpeed);
+      if (this.selectedAvatar === 'mushika_vahana') {
+        this.resetDeformation();
+        // Mushika 4-legged sacred mount rhythmic gallop
+        const gallopSpeed = this.runCycle * 1.6;
+        const gallopBounce = Math.abs(Math.sin(gallopSpeed)) * 0.10;
+        const gallopPitch = Math.sin(gallopSpeed) * 0.05;
+        this.root.position.y = gallopBounce;
 
-      // A. Natural vertical running bounce (one rise per stride)
-      const bounce = Math.abs(Math.sin(this.runCycle)) * 0.08;
-      this.root.position.y = bounce;
+        const speedLean = Math.min(0.20, 0.10 + (runSpeed * 0.02));
+        this.characterGroup.rotation.x = speedLean + gallopPitch;
+        this.characterGroup.rotation.y = Math.sin(gallopSpeed * 0.5) * 0.03;
+        this.characterGroup.rotation.z = this.bankAngle;
+        this.characterGroup.scale.set(1.0, 1.0, 1.0);
+        this.bodyMesh.position.x = 0;
 
-      // B. Athletic Sprinter Forward Pitch
-      const speedLean = Math.min(0.20, 0.12 + (runSpeed * 0.02));
-      this.characterGroup.rotation.x = speedLean;
+        const shadowScale = Math.max(0.75, 1.15 - (gallopBounce * 0.35));
+        this.shadowMesh.scale.set(shadowScale * 1.35, shadowScale * 1.1, 1.0);
+        this.shadowMat.opacity = 0.58 * shadowScale;
+      } else {
+        // Articulate 3D legs and arm counter-swings in mesh grid!
+        this.animateRunningDeformation(this.runCycle, runSpeed);
 
-      // C. Subtle, smooth shoulder sway
-      this.characterGroup.rotation.y = Math.sin(this.runCycle) * 0.04;
+        // A. Natural vertical running bounce (one rise per stride)
+        const bounce = Math.abs(Math.sin(this.runCycle)) * 0.08;
+        this.root.position.y = bounce;
 
-      // D. Rock-solid lateral stability (ZERO horizontal shaking)
-      this.bodyMesh.position.x = 0;
-      this.characterGroup.rotation.z = this.bankAngle;
+        // B. Athletic Sprinter Forward Pitch
+        const speedLean = Math.min(0.20, 0.12 + (runSpeed * 0.02));
+        this.characterGroup.rotation.x = speedLean;
 
-      // E. Rock-solid scale (ZERO squash/stretch jitter)
-      this.characterGroup.scale.set(1.0, 1.0, 1.0);
+        // C. Subtle, smooth shoulder sway
+        this.characterGroup.rotation.y = Math.sin(this.runCycle) * 0.04;
 
-      // F. Smooth contact shadow
-      const shadowScale = Math.max(0.75, 1.0 - (bounce * 0.35));
-      this.shadowMesh.scale.set(shadowScale, shadowScale, 1.0);
-      this.shadowMat.opacity = 0.55 * shadowScale;
+        // D. Rock-solid lateral stability (ZERO horizontal shaking)
+        this.bodyMesh.position.x = 0;
+        this.characterGroup.rotation.z = this.bankAngle;
 
-      // G. Rock-solid, calm, smooth wind flow (ZERO high-frequency shaking)
-      const windWave = Math.sin(this.runCycle * 0.8) * 0.025;
-      this.rightScarf.rotation.z = -0.28 - windWave;
-      this.rightScarf.rotation.x = 0.30 + Math.cos(this.runCycle * 0.8) * 0.02;
-      this.rightScarf.position.y = 1.25;
+        // E. Rock-solid scale (ZERO squash/stretch jitter)
+        this.characterGroup.scale.set(1.0, 1.0, 1.0);
 
-      this.leftScarf.rotation.z = 0.22 + windWave;
-      this.leftScarf.rotation.x = 0.24;
+        // F. Smooth contact shadow
+        const shadowScale = Math.max(0.75, 1.0 - (bounce * 0.35));
+        this.shadowMesh.scale.set(shadowScale, shadowScale, 1.0);
+        this.shadowMat.opacity = 0.55 * shadowScale;
+
+        // G. Rock-solid, calm, smooth wind flow (ZERO high-frequency shaking)
+        const windWave = Math.sin(this.runCycle * 0.8) * 0.025;
+        this.rightScarf.rotation.z = -0.28 - windWave;
+        this.rightScarf.rotation.x = 0.30 + Math.cos(this.runCycle * 0.8) * 0.02;
+        this.rightScarf.position.y = 1.25;
+
+        this.leftScarf.rotation.z = 0.22 + windWave;
+        this.leftScarf.rotation.x = 0.24;
+      }
     }
 
-    // 4. Mushika Mount Animation
-    if (this.isMushikaMounted) {
+    // 4. Mushika Mount Animation (for super dash powerup on bal_ganesha)
+    if (this.isMushikaMounted && this.selectedAvatar !== 'mushika_vahana') {
       this.mushikaGroup.position.y = 0.32 + Math.abs(Math.sin(this.runCycle * 3)) * 0.08;
     }
 
