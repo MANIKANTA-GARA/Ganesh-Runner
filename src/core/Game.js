@@ -106,6 +106,9 @@ export class Game {
     };
     this.chaser = new ChaserManager(this.scene, this.sound);
     this.environment = new EnvironmentManager(this.scene);
+    this.environment.onThemeChange = (theme, weather) => {
+      this.ui?.showLocationBanner(theme, weather);
+    };
     this.environment.initWorld();
     this.obstacles = new ObstacleManager(this.scene, this.particles, this.sound);
     this.collectibles = new CollectibleManager(this.scene, this.particles, this.sound);
@@ -254,11 +257,12 @@ export class Game {
       magnetTime: 0,
       isMultiplier: this.powerUps.isMultiplierActive,
       multiplierTime: 0,
-      zoneName: this.environment.activeZone.name,
+      zoneName: `${this.environment.getCurrentTheme().name} • ${this.environment.getCurrentWeather().icon}`,
       isShivaClose: false,
       shivaDangerPercent: 15
     });
     this.ui.updateTutorialPrompt(this.tutorialSteps);
+    this.ui.showLocationBanner(this.environment.getCurrentTheme(), this.environment.getCurrentWeather());
   }
 
   resetRun() {
@@ -398,7 +402,7 @@ export class Game {
 
     // 4. Update Subsystems
     this.ganesha.update(delta, this.currentSpeed / 8.0);
-    this.environment.update(playerPos.z, this.score.distance);
+    this.environment.update(playerPos.z, this.score.distance, delta);
     this.obstacles.update(delta, playerPos.z, this.currentSpeed, this.runTime);
     this.collectibles.update(delta, playerPos.z, playerPos, isPowerMode || this.powerUps.isMagnetActive);
     this.powerUps.update(delta, playerPos);
@@ -516,7 +520,7 @@ export class Game {
       magnetTime: Math.ceil(this.powerUps.magnetTimer),
       isMultiplier: this.powerUps.isMultiplierActive,
       multiplierTime: Math.ceil(this.powerUps.multiplierTimer),
-      zoneName: this.environment.activeZone.name,
+      zoneName: `${this.environment.getCurrentTheme().name} • ${this.environment.getCurrentWeather().icon}`,
       isShivaClose: this.chaser.isDanger,
       shivaDangerPercent: this.chaser.getDangerPercent()
     });
