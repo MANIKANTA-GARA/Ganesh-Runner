@@ -13,7 +13,8 @@ export class UIManager {
       gameOver: document.getElementById('game-over-screen'),
       characters: document.getElementById('characters-modal'),
       settings: document.getElementById('settings-modal'),
-      calibrate: document.getElementById('calibrate-modal')
+      calibrate: document.getElementById('calibrate-modal'),
+      themes: document.getElementById('themes-modal')
     };
 
     this.hudElements = {
@@ -45,6 +46,7 @@ export class UIManager {
 
     this.bindEvents();
     this.initTargetBadge();
+    this.initThemePreferences();
   }
 
   initTargetBadge() {
@@ -60,6 +62,27 @@ export class UIManager {
     };
     drawBadge();
     characterTextures.onReady(() => drawBadge());
+  }
+
+  initThemePreferences() {
+    const savedTheme = localStorage.getItem('ganesh_selected_theme') || 'AUTO';
+    const savedWeather = localStorage.getItem('ganesh_selected_weather') || 'AUTO';
+
+    document.querySelectorAll('#location-theme-grid .theme-card').forEach(card => {
+      if (card.dataset.theme === savedTheme) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('#weather-theme-grid .theme-card').forEach(card => {
+      if (card.dataset.weather === savedWeather) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
   }
 
   setGame(game) {
@@ -92,6 +115,35 @@ export class UIManager {
     document.getElementById('menu-settings-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.screens.settings?.classList.remove('hidden');
+    });
+
+    document.getElementById('menu-themes-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.initThemePreferences();
+      this.screens.themes?.classList.remove('hidden');
+    });
+
+    // Theme & Weather Card Selection
+    document.querySelectorAll('#location-theme-grid .theme-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        document.querySelectorAll('#location-theme-grid .theme-card').forEach(c => c.classList.remove('active'));
+        const el = e.currentTarget;
+        el.classList.add('active');
+        const themeId = el.dataset.theme;
+        localStorage.setItem('ganesh_selected_theme', themeId);
+        this.game?.setManualTheme(themeId);
+      });
+    });
+
+    document.querySelectorAll('#weather-theme-grid .theme-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        document.querySelectorAll('#weather-theme-grid .theme-card').forEach(c => c.classList.remove('active'));
+        const el = e.currentTarget;
+        el.classList.add('active');
+        const weatherId = el.dataset.weather;
+        localStorage.setItem('ganesh_selected_weather', weatherId);
+        this.game?.setManualWeather(weatherId);
+      });
     });
 
     // Modal Close Buttons
