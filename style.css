@@ -800,31 +800,6 @@ h1.title-gold {
   font-weight: 900;
 }
 
-.hud-in-game-watermark {
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: rgba(255, 215, 0, 0.8);
-  background: rgba(10, 6, 18, 0.7);
-  padding: 3px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  pointer-events: none;
-  white-space: nowrap;
-  backdrop-filter: blur(4px);
-  z-index: 5;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.hud-in-game-watermark strong {
-  color: #ffd700;
-  font-weight: 800;
-}
-
 /* Mobile Screen Tuning for Subway Surfers Touch Controls */
 @media (max-width: 600px) {
   .main-logo {
