@@ -20,7 +20,10 @@ export class RealisticCharacterTextures {
       helicopter: null,
       kailasaSign: null,
       policeBarricade: null,
-      policeOfficers: null
+      policeOfficers: null,
+      trainLocoSide: null,
+      trainCoachSide: null,
+      trainFrontFace: null
     };
 
     this.callbacks = [];
@@ -60,6 +63,9 @@ export class RealisticCharacterTextures {
     this.textures.helicopter = this.generateProceduralHelicopter();
     this.textures.kailasaSign = this.generateProceduralKailasaSign();
     this.textures.policeBarricade = this.generateProceduralPoliceBarricade();
+    this.textures.trainLocoSide = this.generateProceduralTrainLocomotiveTexture();
+    this.textures.trainCoachSide = this.generateProceduralTrainCoachTexture();
+    this.textures.trainFrontFace = this.generateProceduralTrainFrontFaceTexture();
   }
 
   // --- Create Crystal-Clear, Rock-Solid Photorealistic Character Texture (Zero Jitter, Zero Shaking) ---
@@ -940,6 +946,271 @@ export class RealisticCharacterTextures {
     ctx.fillStyle = '#ffea00';
     ctx.font = '900 26px "Arial Black", sans-serif';
     ctx.fillText('⚠ DANGER / JUMP ⚠', 256, 160);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  generateProceduralTrainLocomotiveTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Deep Electric Royal Blue Locomotive Base
+    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+    grad.addColorStop(0, '#0a2e68');
+    grad.addColorStop(0.5, '#0047ab');
+    grad.addColorStop(1, '#002966');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1024, 512);
+
+    // 2. High-Visibility Safety Hazard Yellow Cheat-Line & Chevron Band
+    ctx.fillStyle = '#ffea00';
+    ctx.fillRect(0, 200, 1024, 110);
+
+    // White Pinstripe Borders
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 194, 1024, 6);
+    ctx.fillRect(0, 310, 1024, 6);
+
+    // 3. Indian Railways Iconic Angled Hazard Chevron on Front Section (Left side)
+    ctx.fillStyle = '#ff0038';
+    for (let x = 780; x < 1030; x += 36) {
+      ctx.beginPath();
+      ctx.moveTo(x, 200);
+      ctx.lineTo(x + 18, 200);
+      ctx.lineTo(x - 8, 310);
+      ctx.lineTo(x - 26, 310);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 4. Heavy Steel Dynamic Louvers & Air Intake Vents
+    ctx.fillStyle = '#141e30';
+    for (let vx of [120, 260, 420]) {
+      ctx.fillRect(vx, 70, 110, 100);
+      ctx.fillStyle = '#243b55';
+      for (let s = 76; s < 165; s += 8) {
+        ctx.fillRect(vx + 4, s, 102, 3);
+      }
+      ctx.fillStyle = '#141e30';
+    }
+
+    // 5. Official Indian Railways Typography (Devnagari & English)
+    ctx.fillStyle = '#0a2540';
+    ctx.font = '900 36px "Arial Black", Impact, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('भारतीय रेल', 560, 245);
+    ctx.font = '900 34px "Arial Black", Impact, sans-serif';
+    ctx.fillText('INDIAN RAILWAYS', 560, 290);
+
+    // Locomotive Class & Road Number
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 48px "Arial Black", monospace, sans-serif';
+    ctx.fillText('WAP-7', 80, 272);
+    ctx.font = '900 24px "Arial Black", monospace, sans-serif';
+    ctx.fillText('30201 • ELS / RPM', 80, 430);
+
+    // 6. High-Voltage Danger Lightning Badge (25kV AC)
+    ctx.fillStyle = '#ffea00';
+    ctx.beginPath();
+    ctx.moveTo(40, 100);
+    ctx.lineTo(90, 100);
+    ctx.lineTo(65, 145);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#d90429';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.fillStyle = '#d90429';
+    ctx.beginPath();
+    ctx.moveTo(66, 106);
+    ctx.lineTo(58, 122);
+    ctx.lineTo(67, 122);
+    ctx.lineTo(60, 138);
+    ctx.lineTo(72, 120);
+    ctx.lineTo(64, 120);
+    ctx.closePath();
+    ctx.fill();
+
+    // 7. Structural Panel Rivets & Seams
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    for (let px = 80; px < 1000; px += 180) {
+      ctx.beginPath();
+      ctx.moveTo(px, 40);
+      ctx.lineTo(px, 480);
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  generateProceduralTrainCoachTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Classic Indian Railways Two-Tone Livery (Ultramarine Blue + Sky Blue Window Band)
+    ctx.fillStyle = '#002966';
+    ctx.fillRect(0, 0, 1024, 256);
+
+    // Sky Blue Window Band
+    ctx.fillStyle = '#2176ff';
+    ctx.fillRect(0, 52, 1024, 132);
+
+    // Cream / Yellow Hazard Pinstripes
+    ctx.fillStyle = '#ffea00';
+    ctx.fillRect(0, 46, 1024, 6);
+    ctx.fillRect(0, 184, 1024, 6);
+
+    // 2. Rows of Realistic Passenger Windows with Aluminum Frames and Warm Interior Lighting
+    const winWidth = 68;
+    const winHeight = 78;
+    const startX = 140;
+    const gap = 18;
+
+    for (let i = 0; i < 9; i++) {
+      const wx = startX + i * (winWidth + gap);
+      // Aluminum Outer Gasket
+      ctx.fillStyle = '#ced4da';
+      ctx.fillRect(wx - 3, 76, winWidth + 6, winHeight + 6);
+
+      // Dark Tinted Glass with Warm Amber Glow inside
+      const winGrad = ctx.createLinearGradient(wx, 80, wx, 80 + winHeight);
+      winGrad.addColorStop(0, '#102a43');
+      winGrad.addColorStop(0.4, '#ffbe0b');
+      winGrad.addColorStop(0.7, '#f4a261');
+      winGrad.addColorStop(1, '#0b192c');
+      ctx.fillStyle = winGrad;
+      ctx.fillRect(wx, 79, winWidth, winHeight);
+
+      // Window Glass Reflection Diagonal Glare
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.moveTo(wx + 10, 79);
+      ctx.lineTo(wx + 28, 79);
+      ctx.lineTo(wx + 8, 79 + winHeight);
+      ctx.lineTo(wx - 10, 79 + winHeight);
+      ctx.closePath();
+      ctx.fill();
+
+      // Window security bars
+      ctx.strokeStyle = 'rgba(200, 200, 200, 0.6)';
+      ctx.lineWidth = 1.5;
+      for (let by = 98; by <= 140; by += 16) {
+        ctx.beginPath();
+        ctx.moveTo(wx, by);
+        ctx.lineTo(wx + winWidth, by);
+        ctx.stroke();
+      }
+    }
+
+    // 3. Side Passenger Doors with Hazard Stripes & Chrome Handrail
+    for (let dx of [30, 930]) {
+      ctx.fillStyle = '#001d4a';
+      ctx.fillRect(dx, 36, 68, 195);
+      ctx.strokeStyle = '#ffea00';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(dx, 36, 68, 195);
+
+      // Door window
+      ctx.fillStyle = '#8ecae6';
+      ctx.fillRect(dx + 16, 52, 36, 55);
+
+      // Chrome vertical boarding grab-pole
+      ctx.fillStyle = '#e0e1dd';
+      ctx.fillRect(dx + 56, 44, 4, 180);
+    }
+
+    // 4. Coach Destination Nameboard Banner & Road Number
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(360, 198, 310, 32);
+    ctx.strokeStyle = '#ffea00';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(360, 198, 310, 32);
+
+    ctx.fillStyle = '#002966';
+    ctx.font = '900 16px "Arial Black", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('SPECIAL EXPRESS • KANYAKUMARI', 515, 220);
+
+    ctx.fillStyle = '#ffea00';
+    ctx.font = '900 20px "Arial Black", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('SLEEPER CLASS • S-4', 140, 224);
+    ctx.fillText('21456 / C', 800, 224);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  generateProceduralTrainFrontFaceTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Royal Blue Nose Base
+    ctx.fillStyle = '#003580';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // 2. High-Impact Safety Hazard Yellow V-Chevron
+    ctx.fillStyle = '#ffd000';
+    ctx.beginPath();
+    ctx.moveTo(0, 380);
+    ctx.lineTo(256, 480);
+    ctx.lineTo(512, 380);
+    ctx.lineTo(512, 280);
+    ctx.lineTo(256, 380);
+    ctx.lineTo(0, 280);
+    ctx.closePath();
+    ctx.fill();
+
+    // Red hazard accent stripe
+    ctx.fillStyle = '#d90429';
+    ctx.beginPath();
+    ctx.moveTo(0, 395);
+    ctx.lineTo(256, 495);
+    ctx.lineTo(512, 395);
+    ctx.lineTo(512, 415);
+    ctx.lineTo(256, 512);
+    ctx.lineTo(0, 415);
+    ctx.closePath();
+    ctx.fill();
+
+    // 3. Indian Railways National Crest / Golden Emblem
+    ctx.fillStyle = '#ffb703';
+    ctx.beginPath();
+    ctx.arc(256, 230, 44, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#002966';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.fillStyle = '#002966';
+    ctx.beginPath();
+    ctx.arc(256, 230, 20, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 4. Locomotive Fleet Number "30201"
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(176, 305, 160, 38);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(176, 305, 160, 38);
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '900 28px monospace, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('30201', 256, 334);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
