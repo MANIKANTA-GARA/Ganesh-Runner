@@ -3,14 +3,17 @@ import * as THREE from 'three';
 import { characterTextures } from '../graphics/RealisticCharacterTextures.js';
 
 export const OBSTACLE_TYPES = {
-  BLUE_TRAIN: 'BLUE_TRAIN',       // Indian Railway locomotive train (concept art!)
-  BARRICADE: 'BARRICADE',         // Red/white hazard striped barricade
-  AUTO_RICKSHAW: 'AUTO_RICKSHAW', // Moving Tuk-Tuk vehicle
-  TEMPO_VAN: 'TEMPO_VAN',         // Street delivery van
-  CART: 'CART',                   // Flower vendor cart
-  TORAN_ARCH: 'TORAN_ARCH',       // Slide under
-  CHEST_JUMP: 'CHEST_JUMP',       // Jump over
-  PILLAR: 'PILLAR'                // Stone barrier
+  BLUE_TRAIN: 'BLUE_TRAIN',             // Indian Railways Locomotive (classic)
+  TRAIN_LOCOMOTIVE: 'TRAIN_LOCOMOTIVE', // WAP-7 Indian Railways Electric Locomotive (8.8m)
+  TRAIN_COACH: 'TRAIN_COACH',           // Indian Railways Passenger Coach (9.2m)
+  TRAIN_EXPRESS: 'TRAIN_EXPRESS',       // Full Multi-Car Express Train (Loco + Coach, 17.5m)
+  BARRICADE: 'BARRICADE',               // Red/white hazard striped barricade
+  AUTO_RICKSHAW: 'AUTO_RICKSHAW',       // Moving Tuk-Tuk vehicle
+  TEMPO_VAN: 'TEMPO_VAN',               // Street delivery van
+  CART: 'CART',                         // Flower vendor cart
+  TORAN_ARCH: 'TORAN_ARCH',             // Slide under
+  CHEST_JUMP: 'CHEST_JUMP',             // Jump over
+  PILLAR: 'PILLAR'                      // Stone barrier
 };
 
 export class ObstacleManager {
@@ -63,12 +66,33 @@ export class ObstacleManager {
       roughness: 0.7
     });
 
-    // Blue Train Materials (Electric Royal Blue & High-Vis Hazard Yellow)
+    // Realistic Indian Railways Locomotive & Coach Materials
+    this.trainLocoSideMat = new THREE.MeshStandardMaterial({
+      map: characterTextures.textures.trainLocoSide,
+      emissive: new THREE.Color(0x001a33),
+      emissiveIntensity: 0.35,
+      roughness: 0.32,
+      metalness: 0.25
+    });
+    this.trainCoachSideMat = new THREE.MeshStandardMaterial({
+      map: characterTextures.textures.trainCoachSide,
+      emissive: new THREE.Color(0x001533),
+      emissiveIntensity: 0.35,
+      roughness: 0.32,
+      metalness: 0.20
+    });
+    this.trainFrontFaceMat = new THREE.MeshStandardMaterial({
+      map: characterTextures.textures.trainFrontFace,
+      emissive: new THREE.Color(0x1a1500),
+      emissiveIntensity: 0.30,
+      roughness: 0.32,
+      metalness: 0.20
+    });
     this.trainBlueMat = new THREE.MeshStandardMaterial({
-      color: 0x0066ff, // Punchy electric royal blue
-      emissive: 0x002466,
+      color: 0x005bbb, // Deep authentic Indian Railways electric blue
+      emissive: 0x001c44,
       roughness: 0.28,
-      metalness: 0.4
+      metalness: 0.35
     });
     this.trainYellowMat = new THREE.MeshStandardMaterial({
       color: 0xffea00, // Ultra-vivid safety hazard yellow
@@ -88,6 +112,13 @@ export class ObstacleManager {
       transparent: true,
       opacity: 0.85
     });
+    this.trainBeamConeMat = new THREE.MeshBasicMaterial({
+      color: 0xfff4c2, // Volumetric headlight glow beam
+      transparent: true,
+      opacity: 0.22,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
     this.trainSirenRed = new THREE.MeshBasicMaterial({
       color: 0xff0044 // Flashing emergency cab beacon
     });
@@ -95,6 +126,37 @@ export class ObstacleManager {
       color: 0x212529,
       metalness: 0.8,
       roughness: 0.3
+    });
+    this.steelWheelMat = new THREE.MeshStandardMaterial({
+      color: 0x3d434a,
+      metalness: 0.85,
+      roughness: 0.25
+    });
+    this.flangeMat = new THREE.MeshStandardMaterial({
+      color: 0x2b3036,
+      metalness: 0.9,
+      roughness: 0.2
+    });
+    this.pantographMat = new THREE.MeshStandardMaterial({
+      color: 0xa61c1c, // High-voltage red pantograph arms
+      metalness: 0.65,
+      roughness: 0.3
+    });
+    this.insulatorMat = new THREE.MeshStandardMaterial({
+      color: 0x6e3b1c, // Ceramic insulator brown
+      roughness: 0.3
+    });
+    this.bellowsMat = new THREE.MeshStandardMaterial({
+      color: 0x141414, // Rubber accordion gangway bellows
+      roughness: 0.95
+    });
+    this.chassisMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1e24, // Cast steel locomotive subframe
+      metalness: 0.7,
+      roughness: 0.4
+    });
+    this.tailLightRedMat = new THREE.MeshBasicMaterial({
+      color: 0xff0033 // Glowing red coach marker lights
     });
 
     // Barricade Materials (Neon Safety Orange, Hazard Red & Amber Strobes)
@@ -286,106 +348,461 @@ export class ObstacleManager {
     return group;
   }
 
-  createBlueTrainMesh() {
+  createBogieTruck(zOffset = 0) {
+    const bogie = new THREE.Group();
+    bogie.position.set(0, 0, zOffset);
+
+    // 1. Heavy Cast-Steel Bogie Frame
+    const frameGeo = new THREE.BoxGeometry(1.72, 0.16, 2.1);
+    const frame = new THREE.Mesh(frameGeo, this.chassisMat);
+    frame.position.y = 0.48;
+    frame.castShadow = true;
+    bogie.add(frame);
+
+    // 2. Central Bolster & Pivot Pin
+    const bolsterGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.20, 12);
+    const bolster = new THREE.Mesh(bolsterGeo, this.trainWheelMat);
+    bolster.position.y = 0.52;
+    bogie.add(bolster);
+
+    // 3. Two Axles & 4 Steel Wheels resting exactly on the rails
+    // Exact Gauge: rails in EnvironmentManager are at x = ±0.72. Rail top is at y = 0.20. Wheel radius 0.30 -> Wheel center y = 0.50!
+    const axleZOffsets = [-0.68, 0.68];
+    const wheelTreadGeo = new THREE.CylinderGeometry(0.30, 0.30, 0.10, 14);
+    wheelTreadGeo.rotateZ(Math.PI / 2);
+
+    const wheelFlangeGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.025, 14);
+    wheelFlangeGeo.rotateZ(Math.PI / 2);
+
+    const hubGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.04, 10);
+    hubGeo.rotateZ(Math.PI / 2);
+
+    const springGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.22, 8);
+
+    axleZOffsets.forEach(az => {
+      // Solid steel axle rod connecting left and right wheels
+      const axleRod = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.48, 8), this.trainWheelMat);
+      axleRod.rotation.z = Math.PI / 2;
+      axleRod.position.set(0, 0.50, az);
+      bogie.add(axleRod);
+
+      // Left (-0.72) and Right (+0.72) Wheelsets
+      for (const side of [-1, 1]) {
+        const wx = side * 0.72;
+
+        // Wheel Tread (Rolls directly on top of the steel rail)
+        const tread = new THREE.Mesh(wheelTreadGeo, this.steelWheelMat);
+        tread.position.set(wx, 0.50, az);
+        tread.castShadow = true;
+        bogie.add(tread);
+
+        // Steel Guide Flange (on inside of rail: side * 0.67)
+        const flange = new THREE.Mesh(wheelFlangeGeo, this.flangeMat);
+        flange.position.set(wx - side * 0.05, 0.50, az);
+        bogie.add(flange);
+
+        // Axle Journal Box & Hub Cap
+        const hub = new THREE.Mesh(hubGeo, this.brassMat);
+        hub.position.set(wx + side * 0.06, 0.50, az);
+        bogie.add(hub);
+
+        // Heavy-duty Primary Suspension Coil Springs
+        const spring = new THREE.Mesh(springGeo, this.trainRoofMat);
+        spring.position.set(side * 0.88, 0.61, az);
+        bogie.add(spring);
+      }
+    });
+
+    return bogie;
+  }
+
+  createLocomotiveMesh() {
     const group = new THREE.Group();
 
-    // 1. Lower Chassis Frame (Heavy iron undercarriage)
-    const frameGeo = new THREE.BoxGeometry(1.85, 0.35, 6.2);
-    const frame = new THREE.Mesh(frameGeo, this.trainRoofMat);
-    frame.position.y = 0.45;
-    group.add(frame);
+    // 1. Heavy Underbody Chassis Deck (8.8m length, 1.82m width)
+    const chassisDeck = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.32, 8.6), this.chassisMat);
+    chassisDeck.position.y = 0.56;
+    chassisDeck.castShadow = true;
+    group.add(chassisDeck);
 
-    // 2. High-Vis Front Safety Cowcatcher / Bumper (Safety Hazard Yellow)
-    const cowcatcherGeo = new THREE.BoxGeometry(1.88, 0.42, 0.45);
-    const cowcatcher = new THREE.Mesh(cowcatcherGeo, this.trainYellowMat);
-    cowcatcher.position.set(0, 0.32, 3.15);
-    group.add(cowcatcher);
+    // Heavy Red Buffer Beams at Front & Rear ends
+    for (const bz of [-4.32, 4.32]) {
+      const bufferBeam = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.36, 0.12), this.barricadeRedMat);
+      bufferBeam.position.set(0, 0.56, bz);
+      group.add(bufferBeam);
+    }
 
-    // Cowcatcher center buffer / chevron accent
-    const bufferGeo = new THREE.BoxGeometry(0.7, 0.22, 0.48);
-    const buffer = new THREE.Mesh(bufferGeo, this.barricadeRedMat);
-    buffer.position.set(0, 0.32, 3.18);
-    group.add(buffer);
+    // 2. Center Underbelly Equipment (Transformer Belly, Battery Cabinets & Air Tanks)
+    const belly = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.44, 3.4), this.chassisMat);
+    belly.position.set(0, 0.36, 0);
+    group.add(belly);
 
-    // 3. Locomotive Main Body (Vibrant Electric Royal Blue with Self-Illumination)
-    const bodyGeo = new THREE.BoxGeometry(1.8, 1.7, 6.0);
-    const body = new THREE.Mesh(bodyGeo, this.trainBlueMat);
-    body.position.y = 1.35;
-    body.castShadow = true;
-    group.add(body);
+    // Twin Cylindrical Main Air Brake Reservoirs
+    const reservoirGeo = new THREE.CylinderGeometry(0.18, 0.18, 2.6, 12);
+    reservoirGeo.rotateX(Math.PI / 2);
+    for (const rx of [-0.64, 0.64]) {
+      const tank = new THREE.Mesh(reservoirGeo, this.trainRoofMat);
+      tank.position.set(rx, 0.36, 0);
+      group.add(tank);
+    }
 
-    // 4. High-Contrast Front Yellow Warning Face
-    const frontFaceGeo = new THREE.BoxGeometry(1.82, 1.4, 0.15);
-    const frontFace = new THREE.Mesh(frontFaceGeo, this.trainYellowMat);
-    frontFace.position.set(0, 1.35, 3.01);
-    group.add(frontFace);
+    // 3. Two Dual-Axle Heavy Bogie Trucks (Front at z = 2.4, Rear at z = -2.4)
+    group.add(this.createBogieTruck(2.4));
+    group.add(this.createBogieTruck(-2.4));
 
-    // 5. Golden Yellow Hazard Trim Stripes along locomotive sides
-    const stripeGeo = new THREE.BoxGeometry(1.83, 0.24, 6.02);
-    const stripe = new THREE.Mesh(stripeGeo, this.trainYellowMat);
-    stripe.position.y = 1.25;
-    group.add(stripe);
+    // 4. Heavy Front Wedge Cowcatcher / Cattle Guard (Indian Railways V-Plow)
+    const plowBase = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.36, 0.35), this.trainYellowMat);
+    plowBase.position.set(0, 0.36, 4.45);
+    group.add(plowBase);
 
-    // 6. Sloped Locomotive Cab Roof
-    const roofGeo = new THREE.CylinderGeometry(0.92, 0.92, 6.0, 16, 1, false, 0, Math.PI);
-    roofGeo.rotateZ(Math.PI / 2);
-    const roof = new THREE.Mesh(roofGeo, this.trainRoofMat);
-    roof.position.y = 2.2;
+    // Angled steel plow wedge tips
+    for (const side of [-1, 1]) {
+      const wedgeTip = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.34, 0.25), this.trainYellowMat);
+      wedgeTip.position.set(side * 0.44, 0.36, 4.60);
+      wedgeTip.rotation.y = side * 0.35;
+      group.add(wedgeTip);
+    }
+
+    // Cowcatcher Hazard Chevron Bars (Black & Yellow hazard stripes)
+    for (let hx = -0.72; hx <= 0.72; hx += 0.24) {
+      const hazardBar = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.32, 0.38), this.autoBlackMat);
+      hazardBar.position.set(hx, 0.36, 4.54);
+      group.add(hazardBar);
+    }
+
+    // 5. Front CBC Knuckle Coupler & Buffer Discs
+    const coupler = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 0.42), this.trainWheelMat);
+    coupler.position.set(0, 0.50, 4.68);
+    group.add(coupler);
+
+    const knuckle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.14), this.trainRoofMat);
+    knuckle.position.set(0.06, 0.50, 4.90);
+    group.add(knuckle);
+
+    // Twin Side Buffer Discs (Spring buffers at x = ±0.60)
+    for (const bx of [-0.60, 0.60]) {
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.25, 8), this.trainWheelMat);
+      stem.rotation.x = Math.PI / 2;
+      stem.position.set(bx, 0.56, 4.48);
+      group.add(stem);
+
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.04, 14), this.trainRoofMat);
+      disc.rotation.x = Math.PI / 2;
+      disc.position.set(bx, 0.56, 4.62);
+      group.add(disc);
+    }
+
+    // Air Brake Flexible Hose Pipes (Twin gladhand hoses hanging down)
+    for (const hx of [-0.22, 0.22]) {
+      const hoseMat = (hx < 0) ? this.barricadeRedMat : this.autoGreenMat;
+      const hose = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.32, 8), hoseMat);
+      hose.position.set(hx, 0.38, 4.58);
+      hose.rotation.z = (hx < 0 ? -0.3 : 0.3);
+      group.add(hose);
+    }
+
+    // 6. Locomotive Main Superstructure Body (Length 8.0m, Width 1.80m, Height 1.80m)
+    const bodyBox = new THREE.Mesh(new THREE.BoxGeometry(1.80, 1.76, 7.8), this.trainBlueMat);
+    bodyBox.position.y = 1.60;
+    bodyBox.castShadow = true;
+    group.add(bodyBox);
+
+    // Side Livery Panels with Procedural High-Res Texture ("भारतीय रेल / INDIAN RAILWAYS / WAP-7")
+    const sidePanelGeo = new THREE.PlaneGeometry(7.7, 1.72);
+    // Left Side Panel
+    const sideL = new THREE.Mesh(sidePanelGeo, this.trainLocoSideMat);
+    sideL.position.set(-0.905, 1.60, 0);
+    sideL.rotation.y = -Math.PI / 2;
+    group.add(sideL);
+
+    // Right Side Panel
+    const sideR = new THREE.Mesh(sidePanelGeo, this.trainLocoSideMat);
+    sideR.position.set(0.905, 1.60, 0);
+    sideR.rotation.y = Math.PI / 2;
+    sideR.scale.x = -1; // Mirror for symmetry
+    group.add(sideR);
+
+    // 7. Aerodynamic Sloped Cab Front (Nose)
+    const frontNose = new THREE.Mesh(new THREE.BoxGeometry(1.82, 1.45, 0.45), this.trainBlueMat);
+    frontNose.position.set(0, 1.44, 4.12);
+    group.add(frontNose);
+
+    // Front Nose Texture (Safety Yellow V-Chevron, Fleet Number 30201, Emblem)
+    const noseTexMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.82, 1.45), this.trainFrontFaceMat);
+    noseTexMesh.position.set(0, 1.44, 4.36);
+    group.add(noseTexMesh);
+
+    // Dual Tinted Windshield Panes & Black Rubber Trim
+    const windshieldFrame = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.65, 0.08), this.autoBlackMat);
+    windshieldFrame.position.set(0, 1.88, 4.28);
+    group.add(windshieldFrame);
+
+    for (const wx of [-0.44, 0.44]) {
+      const win = new THREE.Mesh(new THREE.PlaneGeometry(0.68, 0.54), this.windshieldMat);
+      win.position.set(wx, 1.88, 4.33);
+      group.add(win);
+
+      // Windshield Wiper Blade
+      const wiper = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.38, 0.02), this.autoBlackMat);
+      wiper.position.set(wx + 0.12, 1.88, 4.35);
+      wiper.rotation.z = -0.35;
+      group.add(wiper);
+    }
+
+    // Cab Side Rearview Mirrors
+    for (const mx of [-0.98, 0.98]) {
+      const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.32, 0.16), this.trainRoofMat);
+      mirror.position.set(mx, 1.95, 3.85);
+      group.add(mirror);
+
+      const mirrorArm = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 6), this.trainRoofMat);
+      mirrorArm.rotation.z = Math.PI / 2;
+      mirrorArm.position.set(mx * 0.95, 1.95, 3.85);
+      group.add(mirrorArm);
+    }
+
+    // Cab Entry Door Grab Rails
+    for (const hx of [-0.92, 0.92]) {
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.3, 8), this.brassMat);
+      rail.position.set(hx, 1.45, 3.4);
+      group.add(rail);
+    }
+
+    // 8. Curved Aerodynamic Roof & Corrugations
+    const roofCurveGeo = new THREE.CylinderGeometry(0.92, 0.92, 7.8, 16, 1, false, 0, Math.PI);
+    roofCurveGeo.rotateZ(Math.PI / 2);
+    const roof = new THREE.Mesh(roofCurveGeo, this.trainRoofMat);
+    roof.position.y = 2.48;
     group.add(roof);
 
-    // 7. Front Windshield Windows
-    for (let wx of [-0.45, 0.45]) {
-      const winGeo = new THREE.PlaneGeometry(0.65, 0.55);
-      const win = new THREE.Mesh(winGeo, this.windshieldMat);
-      win.position.set(wx, 1.75, 3.09);
-      group.add(win);
+    // Dynamic Brake Cooling Fan Vents on Roof
+    for (const fz of [-0.6, 0.6]) {
+      const fanWell = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.12, 14), this.chassisMat);
+      fanWell.position.set(0, 2.72, fz);
+      group.add(fanWell);
+
+      const fanGrille = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.14, 14), this.trainWheelMat);
+      fanGrille.position.set(0, 2.73, fz);
+      group.add(fanGrille);
     }
 
-    // 8. DUAL High-Intensity Xenon Headlights + Yellow Halo Rings
-    for (let lx of [-0.55, 0.55]) {
-      // Outer bright halo ring
-      const haloGeo = new THREE.CircleGeometry(0.32, 16);
-      const halo = new THREE.Mesh(haloGeo, this.trainLightHaloMat);
-      halo.position.set(lx, 0.95, 3.09);
-      group.add(halo);
-
-      // Core pure white spotlight
-      const lightGeo = new THREE.CircleGeometry(0.22, 16);
-      const light = new THREE.Mesh(lightGeo, this.trainLightMat);
-      light.position.set(lx, 0.95, 3.10);
-      group.add(light);
+    // Rooftop HVAC Pods
+    for (const hz of [-2.4, 1.8]) {
+      const hvac = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.28, 1.4), this.trainRoofMat);
+      hvac.position.set(0, 2.70, hz);
+      group.add(hvac);
     }
 
-    // 9. Center Upper High-Beam Searchlight (Top cab center)
-    const topLightHalo = new THREE.Mesh(new THREE.CircleGeometry(0.32, 16), this.trainLightHaloMat);
-    topLightHalo.position.set(0, 2.18, 3.02);
-    group.add(topLightHalo);
+    // 9. High-Voltage Articulated Pantograph (Diamond Pantograph Assembly)
+    const pantoBase = new THREE.Group();
+    pantoBase.position.set(0, 2.65, -1.8);
 
-    const topLight = new THREE.Mesh(new THREE.CircleGeometry(0.24, 16), this.trainLightMat);
-    topLight.position.set(0, 2.18, 3.03);
-    group.add(topLight);
-
-    // 10. Flashing Emergency Red Cab Beacon on Roof
-    const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 12), this.autoBlackMat);
-    beaconBase.position.set(0, 2.68, 2.2);
-    group.add(beaconBase);
-
-    const redBeacon = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.22, 12), this.trainSirenRed);
-    redBeacon.position.set(0, 2.80, 2.2);
-    group.add(redBeacon);
-
-    // 11. Steel Train Wheels (6 wheels along track)
-    const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.14, 12);
-    wheelGeo.rotateZ(Math.PI / 2);
-    for (let x of [-0.95, 0.95]) {
-      for (let z of [-2.0, 0, 2.0]) {
-        const wheel = new THREE.Mesh(wheelGeo, this.trainWheelMat);
-        wheel.position.set(x, 0.32, z);
-        group.add(wheel);
+    // 4 Ceramic Porcelain Insulators
+    for (const ix of [-0.42, 0.42]) {
+      for (const iz of [-0.45, 0.45]) {
+        const ins = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.18, 8), this.insulatorMat);
+        ins.position.set(ix, 0.09, iz);
+        pantoBase.add(ins);
       }
     }
 
+    // Pantograph Subframe Base
+    const pantoSubframe = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.05, 1.0), this.chassisMat);
+    pantoSubframe.position.y = 0.18;
+    pantoBase.add(pantoSubframe);
+
+    // Lower Arms
+    const lowerArmGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.65, 6);
+    const arm1 = new THREE.Mesh(lowerArmGeo, this.pantographMat);
+    arm1.position.set(0, 0.44, 0.22);
+    arm1.rotation.x = -0.7;
+    pantoBase.add(arm1);
+
+    // Upper Articulated Diamond Arms
+    const arm2 = new THREE.Mesh(lowerArmGeo, this.pantographMat);
+    arm2.position.set(0, 0.76, -0.05);
+    arm2.rotation.x = 0.65;
+    pantoBase.add(arm2);
+
+    // Top Collector Pan (Carbon Contact Strip touching overhead catenary wire)
+    const pan = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.04, 0.12), this.trainRoofMat);
+    pan.position.set(0, 1.02, 0.15);
+    pantoBase.add(pan);
+
+    // Collector Horn Tips (upturned safety ends)
+    for (const px of [-0.67, 0.67]) {
+      const tip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.10, 0.10), this.trainYellowMat);
+      tip.position.set(px, 1.06, 0.15);
+      pantoBase.add(tip);
+    }
+    group.add(pantoBase);
+
+    // Twin Air Horn Trumpets pointing forward
+    for (const hx of [-0.30, -0.22]) {
+      const trumpet = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.42, 8), this.trainRoofMat);
+      trumpet.rotation.x = -Math.PI / 2;
+      trumpet.position.set(hx, 2.76, 3.8);
+      group.add(trumpet);
+    }
+
+    // Flashing Emergency Cab Strobe
+    const beaconBase = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.08, 10), this.autoBlackMat);
+    beaconBase.position.set(0, 2.74, 3.2);
+    group.add(beaconBase);
+
+    const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.12, 0.22, 10), this.trainSirenRed);
+    beacon.position.set(0, 2.86, 3.2);
+    group.add(beacon);
+
+    // 10. LIGHTING SYSTEM (Headlights & Track-Illuminating Volumetric Beam)
+    // Twin Lower Sealed-Beam Headlights
+    for (const lx of [-0.52, 0.52]) {
+      const bezel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.08, 14), this.trainRoofMat);
+      bezel.rotation.x = Math.PI / 2;
+      bezel.position.set(lx, 1.08, 4.36);
+      group.add(bezel);
+
+      const halo = new THREE.Mesh(new THREE.CircleGeometry(0.25, 16), this.trainLightHaloMat);
+      halo.position.set(lx, 1.08, 4.41);
+      group.add(halo);
+
+      const core = new THREE.Mesh(new THREE.CircleGeometry(0.16, 16), this.trainLightMat);
+      core.position.set(lx, 1.08, 4.42);
+      group.add(core);
+    }
+
+    // Upper Cyclops High-Beam Searchlight (Top cab center)
+    const topBezel = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.10, 14), this.trainRoofMat);
+    topBezel.rotation.x = Math.PI / 2;
+    topBezel.position.set(0, 2.38, 4.28);
+    group.add(topBezel);
+
+    const topHalo = new THREE.Mesh(new THREE.CircleGeometry(0.28, 16), this.trainLightHaloMat);
+    topHalo.position.set(0, 2.38, 4.34);
+    group.add(topHalo);
+
+    const topCore = new THREE.Mesh(new THREE.CircleGeometry(0.18, 16), this.trainLightMat);
+    topCore.position.set(0, 2.38, 4.35);
+    group.add(topCore);
+
+    // Forward Volumetric Searchlight Beam Cone (Illuminates tracks ahead!)
+    const beamCone = new THREE.Mesh(new THREE.ConeGeometry(1.6, 20.0, 16, 1, true), this.trainBeamConeMat);
+    beamCone.rotation.x = -Math.PI / 2;
+    beamCone.position.set(0, 1.25, 14.4);
+    group.add(beamCone);
+
     return group;
+  }
+
+  createCoachMesh() {
+    const group = new THREE.Group();
+
+    // 1. Underbody Chassis Frame (9.2m length)
+    const chassisDeck = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.32, 9.0), this.chassisMat);
+    chassisDeck.position.y = 0.56;
+    chassisDeck.castShadow = true;
+    group.add(chassisDeck);
+
+    // Equipment Boxes & Battery Cabinets under floor
+    for (const bz of [-1.2, 1.2]) {
+      const box = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.40, 1.8), this.chassisMat);
+      box.position.set(0, 0.38, bz);
+      group.add(box);
+    }
+
+    // 2. Dual 4-Wheel Bogies (Front at z = 2.8, Rear at z = -2.8)
+    group.add(this.createBogieTruck(2.8));
+    group.add(this.createBogieTruck(-2.8));
+
+    // 3. Passenger Coach Main Body Shell
+    const bodyBox = new THREE.Mesh(new THREE.BoxGeometry(1.80, 1.76, 8.8), this.trainBlueMat);
+    bodyBox.position.y = 1.60;
+    bodyBox.castShadow = true;
+    group.add(bodyBox);
+
+    // Side Panels with Procedural High-Res Texture (Two-tone Indian Railways Blue, 9 windows with warm interior glow)
+    const sidePanelGeo = new THREE.PlaneGeometry(8.75, 1.72);
+    // Left Side
+    const sideL = new THREE.Mesh(sidePanelGeo, this.trainCoachSideMat);
+    sideL.position.set(-0.905, 1.60, 0);
+    sideL.rotation.y = -Math.PI / 2;
+    group.add(sideL);
+
+    // Right Side
+    const sideR = new THREE.Mesh(sidePanelGeo, this.trainCoachSideMat);
+    sideR.position.set(0.905, 1.60, 0);
+    sideR.rotation.y = Math.PI / 2;
+    sideR.scale.x = -1;
+    group.add(sideR);
+
+    // 4. Corrugated Curved Steel Roof
+    const roofCurveGeo = new THREE.CylinderGeometry(0.92, 0.92, 8.8, 16, 1, false, 0, Math.PI);
+    roofCurveGeo.rotateZ(Math.PI / 2);
+    const roof = new THREE.Mesh(roofCurveGeo, this.trainRoofMat);
+    roof.position.y = 2.48;
+    group.add(roof);
+
+    // Circular Torpedo Roof Ventilators
+    for (let vz = -3.2; vz <= 3.2; vz += 1.6) {
+      const vent = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.12, 10), this.chassisMat);
+      vent.position.set(0, 2.74, vz);
+      group.add(vent);
+
+      const ventCap = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), this.trainRoofMat);
+      ventCap.position.set(0, 2.78, vz);
+      group.add(ventCap);
+    }
+
+    // 5. Vestibule / Gangway Rubber Accordion Bellows at both Ends
+    for (const bz of [-4.48, 4.48]) {
+      const bellows = new THREE.Mesh(new THREE.BoxGeometry(1.24, 1.82, 0.32), this.bellowsMat);
+      bellows.position.set(0, 1.58, bz);
+      group.add(bellows);
+
+      // Buffer beam at both ends
+      const bufferBeam = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.34, 0.10), this.barricadeRedMat);
+      bufferBeam.position.set(0, 0.56, bz);
+      group.add(bufferBeam);
+
+      const coupler = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.36), this.trainWheelMat);
+      coupler.position.set(0, 0.50, bz + (bz > 0 ? 0.22 : -0.22));
+      group.add(coupler);
+    }
+
+    // Rear End Glowing Red Tail Marker Lights
+    for (const rx of [-0.55, 0.55]) {
+      const redLight = new THREE.Mesh(new THREE.CircleGeometry(0.14, 12), this.tailLightRedMat);
+      redLight.position.set(rx, 1.65, -4.66);
+      redLight.rotation.y = Math.PI;
+      group.add(redLight);
+    }
+
+    return group;
+  }
+
+  createExpressTrainMesh() {
+    const group = new THREE.Group();
+
+    // 1. WAP-7 Locomotive in front (center z = 4.4)
+    const loco = this.createLocomotiveMesh();
+    loco.position.set(0, 0, 4.4);
+    group.add(loco);
+
+    // 2. Passenger Coach connected behind (center z = -4.7)
+    const coach = this.createCoachMesh();
+    coach.position.set(0, 0, -4.7);
+    group.add(coach);
+
+    // 3. Inter-car Gangway Accordion Rubber Bellows
+    const bellows = new THREE.Mesh(new THREE.BoxGeometry(1.28, 1.84, 0.55), this.bellowsMat);
+    bellows.position.set(0, 1.58, -0.15);
+    group.add(bellows);
+
+    return group;
+  }
+
+  createBlueTrainMesh() {
+    return this.createLocomotiveMesh();
   }
 
   createBarricadeMesh() {
@@ -567,78 +984,79 @@ export class ObstacleManager {
     return group;
   }
 
-  // SPAWN DYNAMIC WAVE (First 20s gentle intro, then escalating dense obstacles!)
+  // SPAWN DYNAMIC WAVE (Trains as the primary realistic railway obstacles!)
   spawnWave(z, runTime = 0) {
     const lanes = [0, 1, 2];
     // Guarantee center lane (1) is 100% open during first 10s for comfortable straight running
     const freeLane = (runTime < 10.0) ? 1 : Math.floor(Math.random() * 3);
     const blockedLanes = lanes.filter(l => l !== freeLane);
 
-    // 1. FIRST 20 SECONDS: Gentle warm-up intro (only 1 obstacle at a time, 2 open lanes)
-    if (runTime < 20.0) {
+    // 1. FIRST 15 SECONDS: Warm-up intro (only 1 obstacle at a time, 2 open lanes)
+    if (runTime < 15.0) {
       const typeChoice = Math.random();
-      if (typeChoice < 0.50) {
+      if (typeChoice < 0.45) {
         // Low barricade to jump over
         this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[0], z, false);
       } else if (typeChoice < 0.75) {
+        // Stabled parked passenger coach on track to introduce train dodging
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, blockedLanes[0], z, false);
+      } else {
         // Toran arch to slide under
         this.spawnSingleObstacle(OBSTACLE_TYPES.TORAN_ARCH, blockedLanes[0], z, false);
-      } else {
-        // Single auto-rickshaw to dodge
-        this.spawnSingleObstacle(OBSTACLE_TYPES.AUTO_RICKSHAW, blockedLanes[0], z, false);
       }
       return;
     }
 
-    // 2. AFTER 20 SECONDS: High-intensity, dynamically scaling obstacle waves!
-    // As time increases (20s -> 60s -> 120s+), density ramps up to "too much obstacles"!
-    const intensity = Math.min(1.0, (runTime - 20.0) / 45.0); // 0.0 at 20s -> 1.0 at 65s
+    // 2. AFTER 15 SECONDS: Dynamic, high-voltage Indian Railways train dodging!
+    // Trains are the prominent, dominant obstacles on the tracks!
+    const intensity = Math.min(1.0, (runTime - 15.0) / 45.0); // 0.0 at 15s -> 1.0 at 60s
     const patternType = Math.random();
 
-    // Chances of 2 lanes blocked scales from 65% up to 88%!
-    const twoLanesChance = 0.65 + intensity * 0.23;
+    // Chances of 2 lanes blocked scales from 60% up to 85%
+    const twoLanesChance = 0.60 + intensity * 0.25;
 
     if (Math.random() < twoLanesChance) {
-      // 2 LANES BLOCKED! (Exciting multi-obstacle combinations)
+      // 2 LANES BLOCKED! (Exciting train dodging combinations)
       const combo = Math.random();
 
       if (combo < 0.35) {
-        // Combo A: Oncoming Blue Locomotive Train on 1 lane + Police Barricade on 2nd lane!
-        this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
+        // Combo A: High-Speed Oncoming Express Train on Lane 1 + Parked Coach on Lane 2!
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_EXPRESS, blockedLanes[0], z, true);
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, blockedLanes[1], z, false);
+      } else if (combo < 0.60) {
+        // Combo B: Oncoming WAP-7 Locomotive on Lane 1 + Police Jump Barricade on Lane 2!
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, blockedLanes[0], z, true);
         this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[1], z, false);
-      } else if (combo < 0.65) {
-        // Combo B: Moving Auto-Rickshaw/Tempo on 1 lane + Slide Toran Arch or Jump Chest on 2nd lane!
-        const vehType = Math.random() > 0.4 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
-        const isMoving = Math.random() > 0.3;
-        this.spawnSingleObstacle(vehType, blockedLanes[0], z, isMoving);
-        const secondType = Math.random() > 0.5 ? OBSTACLE_TYPES.TORAN_ARCH : OBSTACLE_TYPES.CHEST_JUMP;
-        this.spawnSingleObstacle(secondType, blockedLanes[1], z, false);
-      } else if (combo < 0.85) {
-        // Combo C: Double Moving Vehicles (1 locomotive train + 1 auto/tempo staggered)
-        const vehType = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
-        this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
-        this.spawnSingleObstacle(vehType, blockedLanes[1], z + 6, true);
+      } else if (combo < 0.80) {
+        // Combo C: Stabled Parked Coach on Lane 1 + Slide Toran Arch or Auto on Lane 2!
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, blockedLanes[0], z, false);
+        const secondType = Math.random() > 0.5 ? OBSTACLE_TYPES.TORAN_ARCH : OBSTACLE_TYPES.AUTO_RICKSHAW;
+        this.spawnSingleObstacle(secondType, blockedLanes[1], z, secondType === OBSTACLE_TYPES.AUTO_RICKSHAW);
       } else {
-        // Combo D: Double Jump Barricades across 2 lanes
-        this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[0], z, false);
-        this.spawnSingleObstacle(OBSTACLE_TYPES.BARRICADE, blockedLanes[1], z, false);
+        // Combo D: Staggered Double Oncoming Locomotives (charging down adjacent tracks)
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, blockedLanes[0], z, true);
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, blockedLanes[1], z + 12.0, true);
       }
 
-      // HIGH INTENSITY REFLEX CHALLENGE: After 35s, add a consecutive follow-up obstacle in open lane!
-      if (intensity > 0.35 && Math.random() < 0.45) {
-        const followZ = z - (8.0 + Math.random() * 4.0);
+      // HIGH INTENSITY REFLEX CHALLENGE: After 30s, add a quick follow-up obstacle in the free lane
+      if (intensity > 0.30 && Math.random() < 0.40) {
+        const followZ = z - (10.0 + Math.random() * 4.0);
         const followType = Math.random() > 0.5 ? OBSTACLE_TYPES.BARRICADE : OBSTACLE_TYPES.TORAN_ARCH;
         this.spawnSingleObstacle(followType, freeLane, followZ, false);
       }
     } else {
-      // 1 LANE BLOCKED by high-speed oncoming train or moving vehicle
-      if (patternType < 0.45) {
-        this.spawnSingleObstacle(OBSTACLE_TYPES.BLUE_TRAIN, blockedLanes[0], z, true);
-      } else if (patternType < 0.75) {
-        const vehType = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.TEMPO_VAN;
-        this.spawnSingleObstacle(vehType, blockedLanes[0], z, true);
+      // 1 LANE BLOCKED by high-speed oncoming train or parked coach
+      if (patternType < 0.50) {
+        // Oncoming Express Train or Locomotive
+        const trainType = Math.random() > 0.5 ? OBSTACLE_TYPES.TRAIN_EXPRESS : OBSTACLE_TYPES.TRAIN_LOCOMOTIVE;
+        this.spawnSingleObstacle(trainType, blockedLanes[0], z, true);
+      } else if (patternType < 0.80) {
+        // Parked passenger coach on siding track
+        this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, blockedLanes[0], z, false);
       } else {
-        this.spawnSingleObstacle(OBSTACLE_TYPES.CART, blockedLanes[0], z, false);
+        // Street vehicle / vendor cart
+        const vehType = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.CART;
+        this.spawnSingleObstacle(vehType, blockedLanes[0], z, vehType === OBSTACLE_TYPES.AUTO_RICKSHAW);
       }
     }
   }
@@ -649,27 +1067,61 @@ export class ObstacleManager {
     group.position.set(x, 0, z);
 
     let bounds = null;
-    let moveSpeed = isMoving ? 5.5 : 0;
+    let halfLength = 1.5;
+    let isTrain = false;
+    let moveSpeed = 0;
 
-    if (type === OBSTACLE_TYPES.BLUE_TRAIN) {
-      const trainMesh = this.createBlueTrainMesh();
+    if (type === OBSTACLE_TYPES.TRAIN_EXPRESS) {
+      const trainMesh = this.createExpressTrainMesh();
       trainMesh.rotation.y = Math.PI; // Heading towards oncoming player
       group.add(trainMesh);
 
+      halfLength = 9.0;
+      isTrain = true;
+      moveSpeed = isMoving ? 10.0 : 0;
       bounds = {
         minX: x - 0.95, maxX: x + 0.95,
-        minY: 0, maxY: 2.2,
-        minZ: z - 3.1, maxZ: z + 3.1,
+        minY: 0, maxY: 3.4,
+        minZ: z - halfLength, maxZ: z + halfLength,
+        action: 'dodge'
+      };
+    } else if (type === OBSTACLE_TYPES.TRAIN_COACH) {
+      const coachMesh = this.createCoachMesh();
+      if (isMoving) coachMesh.rotation.y = Math.PI;
+      group.add(coachMesh);
+
+      halfLength = 4.6;
+      isTrain = true;
+      moveSpeed = isMoving ? 7.5 : 0;
+      bounds = {
+        minX: x - 0.95, maxX: x + 0.95,
+        minY: 0, maxY: 3.0,
+        minZ: z - halfLength, maxZ: z + halfLength,
+        action: 'dodge'
+      };
+    } else if (type === OBSTACLE_TYPES.TRAIN_LOCOMOTIVE || type === OBSTACLE_TYPES.BLUE_TRAIN) {
+      const locoMesh = this.createLocomotiveMesh();
+      locoMesh.rotation.y = Math.PI; // Heading towards oncoming player
+      group.add(locoMesh);
+
+      halfLength = 4.4;
+      isTrain = true;
+      moveSpeed = isMoving ? 9.0 : 0;
+      bounds = {
+        minX: x - 0.95, maxX: x + 0.95,
+        minY: 0, maxY: 3.4,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'dodge'
       };
     } else if (type === OBSTACLE_TYPES.BARRICADE) {
       const barricadeMesh = this.createBarricadeMesh();
       group.add(barricadeMesh);
 
+      halfLength = 0.35;
       bounds = {
         minX: x - 0.95, maxX: x + 0.95,
         minY: 0, maxY: 0.85,
-        minZ: z - 0.35, maxZ: z + 0.35,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'jump'
       };
     } else if (type === OBSTACLE_TYPES.AUTO_RICKSHAW) {
@@ -677,10 +1129,12 @@ export class ObstacleManager {
       autoMesh.rotation.y = Math.PI; // Facing oncoming player
       group.add(autoMesh);
 
+      halfLength = 1.3;
+      moveSpeed = isMoving ? 6.0 : 0;
       bounds = {
         minX: x - 0.95, maxX: x + 0.95,
         minY: 0, maxY: 1.8,
-        minZ: z - 1.3, maxZ: z + 1.3,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'dodge'
       };
     } else if (type === OBSTACLE_TYPES.TEMPO_VAN) {
@@ -688,40 +1142,45 @@ export class ObstacleManager {
       vanMesh.rotation.y = Math.PI; // Facing oncoming player
       group.add(vanMesh);
 
+      halfLength = 1.6;
+      moveSpeed = isMoving ? 6.5 : 0;
       bounds = {
         minX: x - 0.95, maxX: x + 0.95,
         minY: 0, maxY: 2.0,
-        minZ: z - 1.6, maxZ: z + 1.6,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'dodge'
       };
     } else if (type === OBSTACLE_TYPES.TORAN_ARCH) {
       const archMesh = this.createToranArchMesh();
       group.add(archMesh);
 
+      halfLength = 0.6;
       bounds = {
         minX: x - 1.2, maxX: x + 1.2,
         minY: 1.2, maxY: 2.3,
-        minZ: z - 0.6, maxZ: z + 0.6,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'slide'
       };
     } else if (type === OBSTACLE_TYPES.CHEST_JUMP) {
       const chestMesh = this.createChestMesh();
       group.add(chestMesh);
 
+      halfLength = 0.7;
       bounds = {
         minX: x - 0.85, maxX: x + 0.85,
         minY: 0, maxY: 0.7,
-        minZ: z - 0.7, maxZ: z + 0.7,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'jump'
       };
     } else {
       const cartMesh = this.createCartMesh();
       group.add(cartMesh);
 
+      halfLength = 0.9;
       bounds = {
         minX: x - 1.0, maxX: x + 1.0,
         minY: 0, maxY: 1.4,
-        minZ: z - 0.9, maxZ: z + 0.9,
+        minZ: z - halfLength, maxZ: z + halfLength,
         action: 'dodge'
       };
     }
@@ -729,6 +1188,8 @@ export class ObstacleManager {
     this.scene.add(group);
     this.obstacles.push({
       group, bounds, type, lane, z,
+      halfLength,
+      isTrain,
       active: true,
       isMoving, moveSpeed,
       hasHonked: false
@@ -749,7 +1210,7 @@ export class ObstacleManager {
 
     // Dynamic wave generation:
     // First 20s: 32m to 38m gentle spacing (warmup)
-    // After 20s: wave interval compresses down to 11.5m for dense challenge ("too much obstacles")
+    // After 20s: wave interval compresses down to 12m for dense challenge ("too much obstacles")
     while (this.nextWaveZ > playerZ - this.spawnAheadDistance) {
       this.spawnWave(this.nextWaveZ, this.runTime);
 
@@ -758,29 +1219,33 @@ export class ObstacleManager {
         waveSpacing = 32.0 + Math.random() * 6.0;
       } else {
         const escalation = Math.min(1.0, (this.runTime - 20.0) / 45.0);
-        // Spacing drops from 22m down to 11.5m as run proceeds
-        const baseInterval = THREE.MathUtils.lerp(22.0, 11.5, escalation);
+        // Spacing drops from 22m down to 12.0m as run proceeds
+        const baseInterval = THREE.MathUtils.lerp(22.0, 12.0, escalation);
         waveSpacing = baseInterval + Math.random() * 3.5;
       }
 
       this.nextWaveZ -= waveSpacing;
     }
 
-    const cleanupZ = playerZ + 20;
+    const cleanupZ = playerZ + 35;
     for (let i = this.obstacles.length - 1; i >= 0; i--) {
       const obs = this.obstacles[i];
 
-      // Move oncoming vehicles
+      // Move oncoming vehicles and trains
       if (obs.isMoving && obs.active) {
         obs.z += obs.moveSpeed * delta; // Drives towards player (+Z)
         obs.group.position.z = obs.z;
-        const halfZ = (obs.type === OBSTACLE_TYPES.BLUE_TRAIN) ? 3.1 : (obs.type === OBSTACLE_TYPES.TEMPO_VAN ? 1.6 : 1.3);
+        const halfZ = obs.halfLength || 1.5;
         obs.bounds.minZ = obs.z - halfZ;
         obs.bounds.maxZ = obs.z + halfZ;
 
-        // Honk horn if within 25m of player
-        if (!obs.hasHonked && Math.abs(obs.z - playerZ) < 26) {
-          this.sound.playAutoHorn();
+        // Honk horn if within 38m of player
+        if (!obs.hasHonked && Math.abs(obs.z - playerZ) < 38) {
+          if (obs.isTrain) {
+            this.sound.playTrainHorn();
+          } else {
+            this.sound.playAutoHorn();
+          }
           obs.hasHonked = true;
         }
       }
@@ -807,7 +1272,8 @@ export class ObstacleManager {
       if (!obs.active) continue;
 
       const b = obs.bounds;
-      if (Math.abs(pZ - obs.z) < 1.15) {
+      // Longitudinal collision range with athletic buffer
+      if (pZ >= b.minZ - 0.35 && pZ <= b.maxZ + 0.35) {
         if (pX > b.minX && pX < b.maxX) {
           if (b.action === 'slide') {
             if (isSliding) continue;
@@ -817,7 +1283,7 @@ export class ObstacleManager {
             if (isJumping && pY > 0.8) continue;
             return { hit: true, obstacle: obs };
           }
-          if (b.action === 'dodge' && isJumping && pY > 1.8) continue;
+          if (b.action === 'dodge' && isJumping && pY > b.maxY) continue;
 
           return { hit: true, obstacle: obs };
         }
