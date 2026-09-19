@@ -646,6 +646,147 @@ h1.title-gold {
   border-radius: 8px;
 }
 
+/* 3D Playable Avatar Selection Cards */
+.avatar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.avatar-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 215, 0, 0.28);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-card:hover {
+  background: rgba(255, 215, 0, 0.12);
+  border-color: var(--gold-primary);
+  transform: translateX(4px);
+}
+
+.avatar-card.active {
+  border-color: #ffd700;
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.22), rgba(255, 136, 0, 0.12));
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.4);
+}
+
+.avatar-card.active::before {
+  content: '✓ SELECTED';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #ffd700;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #ffd700;
+  letter-spacing: 0.5px;
+}
+
+.avatar-card-image-wrap {
+  width: 72px;
+  height: 84px;
+  border-radius: 10px;
+  background: radial-gradient(circle at center, #3d1c5a 0%, #150920 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-align: center;
+  background: #ffaa00;
+  color: #1a0800;
+  padding: 1px 0;
+  letter-spacing: 0.5px;
+}
+
+.avatar-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.avatar-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-card-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.avatar-card.active .avatar-card-name {
+  color: #ffd700;
+}
+
+.avatar-card-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  background: rgba(72, 202, 228, 0.2);
+  color: #48cae4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.avatar-card-desc {
+  font-size: 0.74rem;
+  color: #ffd8a8;
+  line-height: 1.3;
+}
+
+.avatar-card-stats {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.avatar-stat-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffd700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
 /* Outfit Selection Cards */
 .outfit-grid {
   display: grid;
