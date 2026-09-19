@@ -112,6 +112,8 @@ export class EnvironmentManager {
     // 30-Second Dynamic Cycle Engine
     this.cycleDuration = 30.0; // 30 seconds per cycle as requested
     this.cycleTimer = 0.0;
+    this.themeMode = 'AUTO'; // 'AUTO' or 'MANUAL'
+    this.weatherMode = 'AUTO'; // 'AUTO' or 'MANUAL'
     this.weatherIndex = 0;
     this.themeIndex = 0;
     this.prevWeather = WEATHER_PROFILES[0];
@@ -144,6 +146,49 @@ export class EnvironmentManager {
 
   getCurrentWeather() {
     return WEATHER_PROFILES[this.weatherIndex];
+  }
+
+  setThemeMode(mode, themeId = null) {
+    this.themeMode = mode;
+    if (mode === 'MANUAL' && themeId) {
+      const idx = SCENERY_THEMES.findIndex(t => t.id === themeId);
+      if (idx !== -1) {
+        this.themeIndex = idx;
+        this.rebuildAllChunks();
+        this.onThemeChange?.(this.getCurrentTheme(), this.getCurrentWeather());
+      }
+    } else if (mode === 'AUTO') {
+      this.cycleTimer = 0.0;
+    }
+  }
+
+  setWeatherMode(mode, weatherId = null) {
+    this.weatherMode = mode;
+    if (mode === 'MANUAL' && weatherId) {
+      const idx = WEATHER_PROFILES.findIndex(w => w.id === weatherId);
+      if (idx !== -1) {
+        this.weatherIndex = idx;
+        this.prevWeather = WEATHER_PROFILES[idx];
+        this.targetWeather = WEATHER_PROFILES[idx];
+        this.weatherBlend = 1.0;
+        this.applyBlendedWeather(WEATHER_PROFILES[idx], WEATHER_PROFILES[idx], 1.0);
+        this.onThemeChange?.(this.getCurrentTheme(), this.getCurrentWeather());
+      }
+    } else if (mode === 'AUTO') {
+      this.cycleTimer = 0.0;
+    }
+  }
+
+  rebuildAllChunks() {
+    this.activeCrowdFigures = [];
+    const oldChunks = [...this.chunks];
+    this.chunks = [];
+    oldChunks.forEach(c => {
+      this.scene.remove(c.group);
+      const newChunk = this.createChunk(c.z, c.distance);
+      this.scene.add(newChunk.group);
+      this.chunks.push(newChunk);
+    });
   }
 
   // -------------------------------------------------------------
@@ -1282,21 +1327,31 @@ export class EnvironmentManager {
   // MAIN UPDATE LOOP (Called every frame with playerZ, distance, delta)
   // -------------------------------------------------------------
   update(playerZ, distance, delta = 0.016) {
-    // 1. Advance 30-Second Weather & Scenery Rotation Timer
-    if (delta > 0 && delta < 0.5) {
+    // 1. Advance 30-Second Weather & Scenery Rotation Timer (if in AUTO mode)
+    if (delta > 0 && delta < 0.5 && (this.themeMode === 'AUTO' || this.weatherMode === 'AUTO')) {
       this.cycleTimer += delta;
       if (this.cycleTimer >= this.cycleDuration) {
         this.cycleTimer = 0.0;
-        this.weatherIndex = (this.weatherIndex + 1) % WEATHER_PROFILES.length;
-        this.themeIndex = (this.themeIndex + 1) % SCENERY_THEMES.length;
+        let changed = false;
 
-        this.prevWeather = this.targetWeather;
-        this.targetWeather = WEATHER_PROFILES[this.weatherIndex];
-        this.weatherBlend = 0.0; // Trigger smooth 3.5s transition
+        if (this.weatherMode === 'AUTO') {
+          this.weatherIndex = (this.weatherIndex + 1) % WEATHER_PROFILES.length;
+          this.prevWeather = this.targetWeather;
+          this.targetWeather = WEATHER_PROFILES[this.weatherIndex];
+          this.weatherBlend = 0.0; // Trigger smooth 3.5s transition
+          changed = true;
+        }
 
-        const newTheme = this.getCurrentTheme();
-        const newWeather = this.targetWeather;
-        this.onThemeChange?.(newTheme, newWeather);
+        if (this.themeMode === 'AUTO') {
+          this.themeIndex = (this.themeIndex + 1) % SCENERY_THEMES.length;
+          changed = true;
+        }
+
+        if (changed) {
+          const newTheme = this.getCurrentTheme();
+          const newWeather = this.targetWeather;
+          this.onThemeChange?.(newTheme, newWeather);
+        }
       }
     }
 
@@ -1382,12 +1437,22 @@ export class EnvironmentManager {
     this.chunks = [];
     this.activeCrowdFigures = [];
     this.cycleTimer = 0.0;
-    this.weatherIndex = 0;
-    this.themeIndex = 0;
-    this.prevWeather = WEATHER_PROFILES[0];
-    this.targetWeather = WEATHER_PROFILES[0];
-    this.weatherBlend = 1.0;
-    this.applyBlendedWeather(WEATHER_PROFILES[0], WEATHER_PROFILES[0], 1.0);
+    if (this.themeMode !== 'MANUAL') {
+      this.themeIndex = 0;
+    }
+    if (this.weatherMode !== 'MANUAL') {
+      this.weatherIndex = 0;
+      this.prevWeather = WEATHER_PROFILES[0];
+      this.targetWeather = WEATHER_PROFILES[0];
+      this.weatherBlend = 1.0;
+      this.applyBlendedWeather(WEATHER_PROFILES[0], WEATHER_PROFILES[0], 1.0);
+    } else {
+      const activeWeather = WEATHER_PROFILES[this.weatherIndex] || WEATHER_PROFILES[0];
+      this.prevWeather = activeWeather;
+      this.targetWeather = activeWeather;
+      this.weatherBlend = 1.0;
+      this.applyBlendedWeather(activeWeather, activeWeather, 1.0);
+    }
     this.initWorld();
   }
 }
