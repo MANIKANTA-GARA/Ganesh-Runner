@@ -6,6 +6,9 @@ const GANESHA_FRONT_RUN_URL = './assets/ganesha_front_run.png';
 const SHIVA_BACK_RUN_URL = './assets/shiva_back_run.png';
 const REF_BACK_URL = './assets/ref_back.jpg';
 const REF_FRONT_URL = './assets/ref_front.jpg';
+const MUSHIKA_FRONT_URL = './assets/mushika_front.png';
+const MUSHIKA_BACK_URL = './assets/mushika_back.png';
+const MUSHIKA_PREVIEW_URL = './assets/mushika_preview.png';
 
 export class RealisticCharacterTextures {
   constructor() {
@@ -14,6 +17,10 @@ export class RealisticCharacterTextures {
       ganeshaFront: null,
       ganeshaBackFrames: [],   // 4 animated running stride frames (Back view)
       ganeshaFrontFrames: [],  // 4 animated running stride frames (Front view)
+      mushikaBack: null,
+      mushikaFront: null,
+      mushikaBackFrames: [],
+      mushikaFrontFrames: [],
       shivaBack: null,
       shivaFront: null,
       shivaBackFrames: [],     // 4 animated running stride frames for Lord Shiva (Back view)
@@ -57,6 +64,10 @@ export class RealisticCharacterTextures {
     this.textures.ganeshaFront = this.generateProceduralGaneshaFront();
     this.textures.ganeshaBackFrames = [this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack];
     this.textures.ganeshaFrontFrames = [this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront];
+    this.textures.mushikaBack = this.textures.ganeshaBack;
+    this.textures.mushikaFront = this.textures.ganeshaFront;
+    this.textures.mushikaBackFrames = [this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack];
+    this.textures.mushikaFrontFrames = [this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront];
     this.textures.shivaBack = this.generateProceduralShivaBack();
     this.textures.shivaFront = this.generateProceduralShivaFront();
     this.textures.shivaBackFrames = [this.textures.shivaBack, this.textures.shivaBack, this.textures.shivaBack, this.textures.shivaBack];
@@ -93,7 +104,7 @@ export class RealisticCharacterTextures {
   // --- Load Reference Images and Extract Ultra-Realistic Cutouts ---
   loadAndExtractTextures() {
     let loadedCount = 0;
-    const totalExpected = 5;
+    const totalExpected = 7;
     const checkAll = () => {
       loadedCount++;
       if (loadedCount >= totalExpected) {
@@ -204,6 +215,46 @@ export class RealisticCharacterTextures {
       checkAll();
     };
     imgFront.src = REF_FRONT_URL;
+
+    // 6. Mushika Vahana Front Texture (media_1789844545415.png front pose)
+    const imgMushikaFront = new Image();
+    imgMushikaFront.crossOrigin = 'anonymous';
+    imgMushikaFront.onload = () => {
+      try {
+        const frontFrames = this.createRunningGaitFrames(imgMushikaFront);
+        this.textures.mushikaFrontFrames = frontFrames;
+        this.textures.mushikaFront = frontFrames[0];
+        this.notifyReady();
+      } catch (err) {
+        console.warn('Error processing mushika front texture:', err);
+      }
+      checkAll();
+    };
+    imgMushikaFront.onerror = (e) => {
+      console.warn('Could not load MUSHIKA_FRONT_URL:', e);
+      checkAll();
+    };
+    imgMushikaFront.src = MUSHIKA_FRONT_URL;
+
+    // 7. Mushika Vahana Rear Running Texture (media_1789844545415.png back running pose)
+    const imgMushikaBack = new Image();
+    imgMushikaBack.crossOrigin = 'anonymous';
+    imgMushikaBack.onload = () => {
+      try {
+        const backFrames = this.createRunningGaitFrames(imgMushikaBack);
+        this.textures.mushikaBackFrames = backFrames;
+        this.textures.mushikaBack = backFrames[0];
+        this.notifyReady();
+      } catch (err) {
+        console.warn('Error processing mushika back texture:', err);
+      }
+      checkAll();
+    };
+    imgMushikaBack.onerror = (e) => {
+      console.warn('Could not load MUSHIKA_BACK_URL:', e);
+      checkAll();
+    };
+    imgMushikaBack.src = MUSHIKA_BACK_URL;
   }
 
   // --- Helper to Crop & Apply Smooth Silhouette Mask ---
