@@ -293,6 +293,75 @@ h1.title-gold {
   text-transform: uppercase;
 }
 
+/* Dynamic 30-Second Location & Weather HUD Banner Toast */
+.hud-location-banner {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 10, 24, 0.88);
+  border: 1.5px solid rgba(255, 215, 0, 0.7);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), 0 0 20px rgba(255, 215, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 20px;
+  border-radius: 30px;
+  pointer-events: none;
+  z-index: 25;
+  white-space: nowrap;
+  animation: bannerSlideInOut 3.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes bannerSlideInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.9);
+  }
+  12% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-15px) scale(0.95);
+  }
+}
+
+.banner-icon-badge {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.6));
+}
+
+.banner-text-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.banner-title {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.banner-sub {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffd8a8;
+  letter-spacing: 0.8px;
+}
+
 /* Top Right Group (Score, Multiplier, Coins, Target) */
 .hud-top-right-group {
   display: flex;
