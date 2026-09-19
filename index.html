@@ -45,7 +45,7 @@
           <div id="menu-highscore-badge" class="badge-highscore">BEST: 0</div>
           <div style="display: flex; gap: 8px;">
             <button id="menu-themes-btn" class="btn-micro" title="Select Theme">🎨 THEMES</button>
-            <button id="menu-characters-btn" class="btn-micro" title="Select Avatar">👘 AVATARS</button>
+            <button id="menu-characters-btn" class="btn-micro" title="Select Avatar">👑 AVATARS</button>
             <button id="menu-settings-btn" class="btn-micro" title="Settings">⚙ SETTINGS</button>
           </div>
         </div>
@@ -218,12 +218,67 @@
 
     <!-- 7. Characters Modal -->
     <div id="characters-modal" class="modal-overlay hidden">
-      <div class="modal-content">
+      <div class="modal-content" style="max-height: 88vh; overflow-y: auto;">
         <div class="modal-header">
-          <h2 class="modal-title">DIVINE AVATARS</h2>
+          <h2 class="modal-title">👑 DIVINE AVATARS</h2>
           <button class="modal-close-btn">×</button>
         </div>
-        <p style="font-size: 0.9rem; color: #ccc;">Select Lord Ganesha's blessed attire for your run:</p>
+        <p style="font-size: 0.86rem; color: #ffd8a8; margin-bottom: 12px; line-height: 1.3;">
+          Select your 3D playable character for the run:
+        </p>
+
+        <!-- 3D Playable Avatar Selection Grid -->
+        <div style="font-weight: 800; color: #ffd700; font-size: 0.88rem; margin-bottom: 8px; letter-spacing: 1px;">
+          ⚡ SELECT 3D PLAYABLE CHARACTER
+        </div>
+        <div class="avatar-grid" id="avatar-selection-grid">
+          <!-- Card 1: Bal Ganesha -->
+          <div class="avatar-card active" data-avatar="bal_ganesha">
+            <div class="avatar-card-image-wrap">
+              <img src="./assets/bal_ganesha_preview.png" alt="Bal Ganesha" class="avatar-card-img" />
+              <span class="avatar-badge">PLAYABLE</span>
+            </div>
+            <div class="avatar-card-info">
+              <div class="avatar-card-title-row">
+                <span class="avatar-card-name">Bal Ganesha</span>
+                <span class="avatar-card-tag">AGILE RUNNER</span>
+              </div>
+              <div class="avatar-card-desc">
+                The divine child sprinting swiftly across railway tracks with holy silk angavastram ribbons fluttering in the wind.
+              </div>
+              <div class="avatar-card-stats">
+                <span class="avatar-stat-pill">🏃 Speed: High</span>
+                <span class="avatar-stat-pill">✨ Ribbon Trail</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Lord Ganesha on Mushika Vahana -->
+          <div class="avatar-card" data-avatar="mushika_vahana">
+            <div class="avatar-card-image-wrap">
+              <img src="./assets/mushika_preview.png" alt="Ganesha on Mushika" class="avatar-card-img" />
+              <span class="avatar-badge" style="background: linear-gradient(135deg, #ffd700, #ff8800);">NEW 3D MODEL</span>
+            </div>
+            <div class="avatar-card-info">
+              <div class="avatar-card-title-row">
+                <span class="avatar-card-name">Mushika Vahana</span>
+                <span class="avatar-card-tag" style="background: rgba(255, 170, 0, 0.25); color: #ffbe0b;">SACRED MOUNT</span>
+              </div>
+              <div class="avatar-card-desc">
+                Lord Ganesha majestically riding His sacred mouse mount Mushika with golden mukut, pearl necklaces, and celestial gallop.
+              </div>
+              <div class="avatar-card-stats">
+                <span class="avatar-stat-pill">🐭 Sacred Mount</span>
+                <span class="avatar-stat-pill">⚡ Gallop Stride</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sacred Silks / Outfits -->
+        <div style="font-weight: 800; color: #ffd700; font-size: 0.88rem; margin: 18px 0 8px 0; letter-spacing: 1px;">
+          👘 SACRED ATTIRE & BLESSINGS
+        </div>
         <div class="outfit-grid">
           <div class="outfit-card active" data-outfit="pitambara">
             <div>
