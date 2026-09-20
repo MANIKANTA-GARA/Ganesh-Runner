@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import readline from 'readline';
 import https from 'https';
 import os from 'os';
@@ -54,6 +55,7 @@ async function main() {
         port: 443,
         path: u.pathname + u.search,
         method: method,
+        timeout: 20000,
         headers: {
           'Authorization': `token ${token}`,
           'User-Agent': 'Ganesha-Runner-Deployer',
@@ -74,6 +76,11 @@ async function main() {
           try { data = JSON.parse(bodyStr); } catch (e) { data = bodyStr; }
           resolve({ status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 300, data });
         });
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ status: 0, ok: false, data: { message: 'Connection timed out' } });
       });
 
       req.on('error', (err) => {
@@ -167,12 +174,23 @@ async function main() {
     const contentBuffer = await fs.promises.readFile(file.fullPath);
     const base64Content = contentBuffer.toString('base64');
 
+    // Calculate local git blob SHA to avoid redundant uploads
+    const gitSha = crypto.createHash('sha1')
+      .update(Buffer.concat([Buffer.from(`blob ${contentBuffer.length}\0`), contentBuffer]))
+      .digest('hex');
+
     // Check if file already exists on this branch to get SHA
     const checkRes = await apiRequest(`https://api.github.com/repos/${username}/${repoName}/contents/${encodeURI(file.relPath)}?ref=${defaultBranch}`);
     const sha = (checkRes.ok && checkRes.data && checkRes.data.sha) ? checkRes.data.sha : undefined;
 
+    if (sha && sha === gitSha) {
+      successCount++;
+      console.log(`  ✓ [${successCount}/${allFiles.length}] ${file.relPath} (up to date)`);
+      continue;
+    }
+
     const body = {
-      message: `Update: ${file.relPath} (Realistic Trains & Photorealistic Ganesha)`,
+      message: `Update: ${file.relPath} (Laddu arrival physical contact & no auto-magnet)`,
       content: base64Content,
       branch: defaultBranch
     };
@@ -186,7 +204,7 @@ async function main() {
 
     if (putRes.ok) {
       successCount++;
-      console.log(`  ✓ [${successCount}/${allFiles.length}] ${file.relPath}`);
+      console.log(`  ✓ [${successCount}/${allFiles.length}] ${file.relPath} (uploaded)`);
     } else {
       console.warn(`  ✗ Failed: ${file.relPath} - ${putRes.data?.message || putRes.status}`);
     }
