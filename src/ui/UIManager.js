@@ -52,20 +52,33 @@ export class UIManager {
 
   initTargetBadge() {
     const drawBadge = () => {
-      const canvas = document.getElementById('target-ganesha-badge-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
-      const tex = (savedAvatar === 'mushika_vahana')
-        ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
-        : characterTextures.textures.ganeshaFront;
-      if (tex && tex.image) {
-        ctx.clearRect(0, 0, 48, 48);
-        ctx.drawImage(tex.image, 0, 0, 48, 48);
-      }
-      const targetNameEl = document.querySelector('.target-name');
-      if (targetNameEl) {
-        targetNameEl.textContent = (savedAvatar === 'mushika_vahana') ? 'MUSHIKA' : 'GANESHA';
+      try {
+        const canvas = document.getElementById('target-ganesha-badge-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let savedAvatar = 'bal_ganesha';
+        try {
+          savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
+        } catch (e) {}
+
+        const tex = (savedAvatar === 'mushika_vahana')
+          ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
+          : characterTextures.textures.ganeshaFront;
+
+        if (tex && tex.image) {
+          const img = tex.image;
+          const isReady = (img instanceof HTMLCanvasElement) || (img.complete && img.naturalWidth > 0);
+          if (isReady) {
+            ctx.clearRect(0, 0, 48, 48);
+            ctx.drawImage(img, 0, 0, 48, 48);
+          }
+        }
+        const targetNameEl = document.querySelector('.target-name');
+        if (targetNameEl) {
+          targetNameEl.textContent = (savedAvatar === 'mushika_vahana') ? 'MUSHIKA' : 'GANESHA';
+        }
+      } catch (err) {
+        console.warn('Could not draw target badge:', err);
       }
     };
     drawBadge();
@@ -212,7 +225,7 @@ export class UIManager {
         const el = e.currentTarget;
         el.classList.add('active');
         const outfitId = el.dataset.outfit;
-        this.game.ganesha.setOutfit(outfitId);
+        this.game?.ganesha?.setOutfit(outfitId);
       });
     });
 
@@ -222,7 +235,7 @@ export class UIManager {
         document.querySelectorAll('.control-mode-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         const mode = e.currentTarget.dataset.mode;
-        this.game.input.setControlMode(mode);
+        this.game?.input?.setControlMode(mode);
       });
     });
 
@@ -231,75 +244,75 @@ export class UIManager {
         document.querySelectorAll('.sensitivity-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         const sens = e.currentTarget.dataset.sens;
-        this.game.input.setSensitivity(sens);
+        this.game?.input?.setSensitivity(sens);
       });
     });
 
     document.getElementById('open-calibrate-btn')?.addEventListener('click', () => {
-      this.screens.calibrate.classList.remove('hidden');
+      this.screens.calibrate?.classList.remove('hidden');
     });
 
     document.getElementById('calibrate-action-btn')?.addEventListener('click', () => {
-      this.game.input.requestTiltPermission().then(() => {
-        this.game.input.calibratePhone();
+      this.game?.input?.requestTiltPermission?.()?.then(() => {
+        this.game?.input?.calibratePhone();
         const statusEl = document.getElementById('calibrate-status');
         if (statusEl) {
           statusEl.textContent = '✓ Calibrated Successfully!';
           statusEl.style.color = '#4ade80';
         }
         setTimeout(() => {
-          this.screens.calibrate.classList.add('hidden');
+          this.screens.calibrate?.classList.add('hidden');
           if (statusEl) statusEl.textContent = '';
         }, 800);
       });
     });
 
     document.getElementById('toggle-music')?.addEventListener('change', (e) => {
-      this.game.sound.setMusicEnabled(e.target.checked);
+      this.game?.sound?.setMusicEnabled(e.target.checked);
     });
 
     document.getElementById('toggle-sfx')?.addEventListener('change', (e) => {
-      this.game.sound.setSfxEnabled(e.target.checked);
+      this.game?.sound?.setSfxEnabled(e.target.checked);
     });
 
     // 6. HUD Pause Button
     document.getElementById('hud-pause-btn')?.addEventListener('click', () => {
-      this.game.togglePause();
+      this.game?.togglePause();
     });
 
     this.hudElements.divineBtn?.addEventListener('click', () => {
-      this.game.handleDivineActivation();
+      this.game?.handleDivineActivation();
     });
 
     // 7. Pause Screen Buttons
     document.getElementById('pause-resume-btn')?.addEventListener('click', () => {
-      this.game.togglePause();
+      this.game?.togglePause();
     });
 
     document.getElementById('pause-restart-btn')?.addEventListener('click', () => {
-      this.screens.pauseMenu.classList.add('hidden');
-      this.game.startRun();
+      this.screens.pauseMenu?.classList.add('hidden');
+      this.game?.startRun();
     });
 
     document.getElementById('pause-settings-btn')?.addEventListener('click', () => {
-      this.screens.settings.classList.remove('hidden');
+      this.screens.settings?.classList.remove('hidden');
     });
 
     document.getElementById('pause-menu-btn')?.addEventListener('click', () => {
-      this.screens.pauseMenu.classList.add('hidden');
-      this.screens.hud.classList.add('hidden');
+      this.screens.pauseMenu?.classList.add('hidden');
+      this.screens.hud?.classList.add('hidden');
       this.showMainMenu();
     });
 
     // 8. Game Over Screen Buttons
     document.getElementById('gameover-retry-btn')?.addEventListener('click', () => {
-      this.screens.gameOver.classList.add('hidden');
-      this.game.startRun();
+      this.screens.gameOver?.classList.add('hidden');
+      this.game?.startRun();
     });
 
     document.getElementById('gameover-menu-btn')?.addEventListener('click', () => {
-      this.screens.gameOver.classList.add('hidden');
-      this.screens.hud.classList.add('hidden');
+      this.screens.gameOver?.classList.add('hidden');
+      this.screens.hud?.classList.add('hidden');
       this.showMainMenu();
     });
 
