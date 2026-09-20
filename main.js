@@ -3,11 +3,26 @@ import './style.css';
 import { Game } from './src/core/Game.js';
 import { UIManager } from './src/ui/UIManager.js';
 
-window.addEventListener('DOMContentLoaded', () => {
-  const canvasContainer = document.getElementById('game-canvas-container');
-  const ui = new UIManager();
-  const game = new Game(canvasContainer, ui);
+function bootstrapGame() {
+  try {
+    const canvasContainer = document.getElementById('game-canvas-container');
+    if (!canvasContainer) {
+      setTimeout(bootstrapGame, 30);
+      return;
+    }
 
-  ui.setGame(game);
-  ui.checkInitialScreen();
-});
+    const ui = new UIManager();
+    const game = new Game(canvasContainer, ui);
+
+    ui.setGame(game);
+    ui.checkInitialScreen();
+  } catch (err) {
+    console.error('Fatal initialization error in Ganesh Runner:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapGame);
+} else {
+  bootstrapGame();
+}
