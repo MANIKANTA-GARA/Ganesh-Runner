@@ -464,7 +464,7 @@ export class Game {
     this.ganesha.update(delta, this.currentSpeed / 8.0);
     this.environment.update(playerPos.z, this.score.distance, delta);
     this.obstacles.update(delta, playerPos.z, this.currentSpeed, this.runTime);
-    this.collectibles.update(delta, playerPos.z, playerPos, isPowerMode || this.powerUps.isMagnetActive);
+    this.collectibles.update(delta, playerPos.z, playerPos, this.powerUps.isMagnetActive);
     this.powerUps.update(delta, playerPos);
     this.particles.update(delta, playerPos, this.powerUps.isDivineMode, this.powerUps.isMushikaActive);
 
@@ -487,18 +487,12 @@ export class Game {
       });
     }
 
-    // Dynamic Power-Up Drops during run
-    if (Math.random() < 0.0006 && !this.powerUps.hasShield) {
+    // Dynamic Shield / Multiplier (Coin Magnet auto-activation removed so laddus never self-collect!)
+    if (Math.random() < 0.0004 && !this.powerUps.hasShield) {
       this.powerUps.activateShield();
     }
-    if (Math.random() < 0.0005 && !this.powerUps.isMagnetActive) {
-      this.powerUps.activateCoinMagnet(10);
-    }
-    if (Math.random() < 0.0004 && !this.powerUps.isMultiplierActive) {
+    if (Math.random() < 0.0003 && !this.powerUps.isMultiplierActive) {
       this.powerUps.activateCoinMultiplier(10);
-    }
-    if (Math.random() < 0.00025 && !this.powerUps.isMushikaActive) {
-      this.powerUps.activateMushikaDash();
     }
 
     if (this.gracePeriodTimer > 0) {
