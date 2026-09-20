@@ -1,4 +1,5 @@
-﻿// main.js - Application Entry Point
+// main.js - Application Entry Point
+import './style.css';
 import { Game } from './src/core/Game.js';
 import { UIManager } from './src/ui/UIManager.js';
 
