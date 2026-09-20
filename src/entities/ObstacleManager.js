@@ -930,14 +930,16 @@ export class ObstacleManager {
   }
 
   // Hard Safety Validator: Check that adding an obstacle will NEVER block all 3 tracks at any point in Z
-  isSafeToSpawn(lane, z, halfLength) {
+  isSafeToSpawn(lane, z, halfLength, isMoving = false) {
     if (lane < 0 || lane > 2) return false;
 
+    // Longitudinal sweep bounds
     const zStart = z - halfLength;
-    const zEnd = z + halfLength;
+    // Moving obstacles travel forward towards player (+Z) by ~65m
+    const zEnd = isMoving ? z + halfLength + 65.0 : z + halfLength;
 
-    // Check at sample intervals across the proposed obstacle's span
-    const step = 1.5;
+    // Check across the span
+    const step = 2.0;
     for (let curZ = zStart; curZ <= zEnd; curZ += step) {
       let blockedLanesCount = 1; // Proposed obstacle blocks this lane
 
@@ -947,7 +949,17 @@ export class ObstacleManager {
         const isOtherBlocked = this.obstacles.some(obs => {
           if (!obs.active) return false;
           if (obs.lane !== otherLane) return false;
-          return (curZ >= obs.bounds.minZ - 0.4 && curZ <= obs.bounds.maxZ + 0.4);
+
+          const obsHalf = obs.halfLength || 1.5;
+          const obsMin = obs.bounds ? obs.bounds.minZ : (obs.z - obsHalf);
+          const obsMax = obs.bounds ? obs.bounds.maxZ : (obs.z + obsHalf);
+
+          if (obs.isMoving) {
+            // Moving obstacle covers its current position and forward travel path
+            return (curZ >= obsMin - 1.0 && curZ <= obsMax + 65.0);
+          } else {
+            return (curZ >= obsMin - 0.8 && curZ <= obsMax + 0.8);
+          }
         });
 
         if (isOtherBlocked) {
@@ -957,6 +969,11 @@ export class ObstacleManager {
 
       // If all 3 lanes would be blocked at curZ, STRICTLY REJECT!
       if (blockedLanesCount >= 3) {
+        return false;
+      }
+
+      // If the proposed obstacle is moving, require BOTH other lanes to be open along its path!
+      if (isMoving && blockedLanesCount >= 2) {
         return false;
       }
     }
@@ -987,16 +1004,16 @@ export class ObstacleManager {
     }
 
     // 2. AFTER 12 SECONDS: High-adrenaline railway runner
-    // User requested: "the player will be allowed to run in single track Other two tracks are filled with the trains then they will be more on Run"
+    // User requested: "please put the two trains on the track and one has the player has move or keep one track to the run"
     
     const waveChoice = Math.random();
 
     if (waveChoice < 0.65) {
       // =========================================================================
-      // SCENARIO 1: DOUBLE TRAIN CORRIDOR (2 tracks filled with trains, 1 track open!)
+      // SCENARIO 1: DOUBLE TRAIN CORRIDOR (2 tracks have trains, 1 track guaranteed open!)
       // =========================================================================
       // Pick which track is the SINGLE OPEN RUNWAY:
-      // 50% chance: Center track (Lane 1) flanked by trains on both sides (tracks 0 & 2)
+      // 50% chance: Center track (Lane 1) open, flanked by trains on left & right (tracks 0 & 2)
       // 25% chance: Left track (Lane 0) open, trains on tracks 1 & 2
       // 25% chance: Right track (Lane 2) open, trains on tracks 0 & 1
       let freeLane;
@@ -1011,35 +1028,32 @@ export class ObstacleManager {
 
       const trainLanes = lanes.filter(l => l !== freeLane);
       // Both trainLanes will have trains!
+      // CRITICAL RULE: Both trains MUST be 100% STATIONARY (stabled coaches / parked locomotives).
+      // Stationary trains never move along Z, guaranteeing they NEVER drift forward into adjacent waves!
+      // The single open runway (freeLane) remains 100% safe and unobstructed.
 
       const comboRoll = Math.random();
       if (comboRoll < 0.35) {
-        // COMBO A: 1 MOVING ONCOMING TRAIN (with headlights & horn) + 1 STANDING STABLED COACH
-        const movingLane = Math.random() > 0.5 ? trainLanes[0] : trainLanes[1];
-        const standingLane = (movingLane === trainLanes[0]) ? trainLanes[1] : trainLanes[0];
-        
-        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_EXPRESS, movingLane, z, true);
-        const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, standingLane, z, false);
-        if (obs1) spawned.push(obs1);
-        if (obs2) spawned.push(obs2);
-      } else if (comboRoll < 0.65) {
-        // COMBO B: DOUBLE STANDING PASSENGER COACHES (Authentic Railway Yard Corridor!)
+        // COMBO A: 2 STANDING PASSENGER COACHES (Authentic Indian Railways Yard)
         const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, trainLanes[0], z, false);
         const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, trainLanes[1], z, false);
         if (obs1) spawned.push(obs1);
         if (obs2) spawned.push(obs2);
+      } else if (comboRoll < 0.65) {
+        // COMBO B: 1 FULL EXPRESS TRAIN (Standing) + 1 PASSENGER COACH (Standing)
+        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_EXPRESS, trainLanes[0], z, false);
+        const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, trainLanes[1], z, false);
+        if (obs1) spawned.push(obs1);
+        if (obs2) spawned.push(obs2);
       } else if (comboRoll < 0.85) {
-        // COMBO C: 1 MOVING WAP-7 LOCOMOTIVE + 1 STANDING WAP-7 LOCOMOTIVE
-        const movingLane = Math.random() > 0.5 ? trainLanes[0] : trainLanes[1];
-        const standingLane = (movingLane === trainLanes[0]) ? trainLanes[1] : trainLanes[0];
-        
-        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, movingLane, z, true);
-        const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, standingLane, z, false);
+        // COMBO C: 1 WAP-7 LOCOMOTIVE (Standing) + 1 PASSENGER COACH (Standing)
+        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, trainLanes[0], z, false);
+        const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_COACH, trainLanes[1], z, false);
         if (obs1) spawned.push(obs1);
         if (obs2) spawned.push(obs2);
       } else {
-        // COMBO D: 1 FULL EXPRESS TRAIN (Standing) + 1 LOCOMOTIVE (Standing)
-        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_EXPRESS, trainLanes[0], z, false);
+        // COMBO D: 2 WAP-7 LOCOMOTIVES (Standing side-by-side)
+        const obs1 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, trainLanes[0], z, false);
         const obs2 = this.spawnSingleObstacle(OBSTACLE_TYPES.TRAIN_LOCOMOTIVE, trainLanes[1], z, false);
         if (obs1) spawned.push(obs1);
         if (obs2) spawned.push(obs2);
@@ -1059,36 +1073,35 @@ export class ObstacleManager {
 
     } else if (waveChoice < 0.90) {
       // =========================================================================
-      // SCENARIO 2: SINGLE TRAIN (1 track has train, other 2 tracks are open!)
+      // SCENARIO 2: SINGLE TRAIN (1 track has train, other 2 tracks are 100% open!)
       // =========================================================================
       const trainLane = Math.floor(Math.random() * 3);
+      // Can be moving (50%) or stationary (50%)
       const isMoving = Math.random() < 0.50;
       const trainType = Math.random() > 0.5 ? OBSTACLE_TYPES.TRAIN_EXPRESS : OBSTACLE_TYPES.TRAIN_COACH;
       
       const obs = this.spawnSingleObstacle(trainType, trainLane, z, isMoving);
       if (obs) spawned.push(obs);
 
-      // On one of the other 2 tracks, optionally place a low flower cart
-      if (Math.random() < 0.40) {
-        const otherLanes = lanes.filter(l => l !== trainLane);
-        const cartLane = otherLanes[Math.floor(Math.random() * otherLanes.length)];
-        const cartObs = this.spawnSingleObstacle(OBSTACLE_TYPES.CART, cartLane, z, false);
-        if (cartObs) spawned.push(cartObs);
-      }
+      // The other TWO tracks remain 100% completely open and clear!
+      // No carts or barriers on the other 2 tracks, giving the player two full lanes to dodge!
     } else {
       // =========================================================================
-      // SCENARIO 3: STREET VEHICLE & BARRICADES (1 or 2 tracks, leaving 1-2 open)
+      // SCENARIO 3: STREET VEHICLES & BARRICADES (1 or 2 tracks, leaving at least 1-2 open)
       // =========================================================================
       const freeLane = Math.floor(Math.random() * 3);
       const blockedLanes = lanes.filter(l => l !== freeLane);
 
       const type1 = Math.random() > 0.5 ? OBSTACLE_TYPES.AUTO_RICKSHAW : OBSTACLE_TYPES.BARRICADE;
-      const obs1 = this.spawnSingleObstacle(type1, blockedLanes[0], z, type1 === OBSTACLE_TYPES.AUTO_RICKSHAW);
+      const isMoving1 = type1 === OBSTACLE_TYPES.AUTO_RICKSHAW;
+      const obs1 = this.spawnSingleObstacle(type1, blockedLanes[0], z, isMoving1);
       if (obs1) spawned.push(obs1);
 
-      if (Math.random() < 0.50) {
-        const type2 = Math.random() > 0.5 ? OBSTACLE_TYPES.TORAN_ARCH : OBSTACLE_TYPES.TEMPO_VAN;
-        const obs2 = this.spawnSingleObstacle(type2, blockedLanes[1], z, type2 === OBSTACLE_TYPES.TEMPO_VAN);
+      // If obstacle 1 is moving, leave both other tracks open!
+      // Only spawn obstacle 2 if obstacle 1 is stationary and obstacle 2 is also stationary!
+      if (!isMoving1 && Math.random() < 0.50) {
+        const type2 = Math.random() > 0.5 ? OBSTACLE_TYPES.TORAN_ARCH : OBSTACLE_TYPES.BARRICADE;
+        const obs2 = this.spawnSingleObstacle(type2, blockedLanes[1], z, false);
         if (obs2) spawned.push(obs2);
       }
     }
@@ -1110,7 +1123,7 @@ export class ObstacleManager {
     else halfLength = 0.9;
 
     // Hard Safety Validator: Check that adding this obstacle will NEVER block all 3 tracks!
-    if (!this.isSafeToSpawn(lane, z, halfLength)) {
+    if (!this.isSafeToSpawn(lane, z, halfLength, isMoving)) {
       return null;
     }
 
@@ -1267,13 +1280,41 @@ export class ObstacleManager {
       const waveHalfLength = this.spawnWave(this.nextWaveZ, this.runTime) || 8.0;
 
       // Fair, reaction-friendly spacing:
-      // Minimum 26.0m to 32.0m of 100% open tracks between any two wave boundaries!
+      // Minimum 28.0m to 36.0m of 100% open tracks between any two wave boundaries!
       // Next wave center must account for current wave half length + clearance gap + estimated next half length
-      const clearanceGap = 26.0 + Math.random() * 6.0; // 26m to 32m completely empty tracks across all 3 lanes
+      const clearanceGap = 28.0 + Math.random() * 8.0; // 28m to 36m completely empty tracks across all 3 lanes
       const estimatedNextHalfLength = 8.5; // Account for upcoming express train half length
       const waveSpacing = waveHalfLength + clearanceGap + estimatedNextHalfLength;
 
       this.nextWaveZ -= waveSpacing;
+    }
+
+    // Runtime Invariant Fail-Safe:
+    // Guarantee that obstacles NEVER block all 3 tracks simultaneously at any point along Z!
+    for (let i = 0; i < this.obstacles.length; i++) {
+      const obs = this.obstacles[i];
+      if (!obs.active || !obs.isMoving) continue;
+
+      const checkZ = obs.z;
+      const blockedLanes = new Set([obs.lane]);
+
+      for (let j = 0; j < this.obstacles.length; j++) {
+        if (i === j) continue;
+        const other = this.obstacles[j];
+        if (!other.active) continue;
+
+        const otherMin = other.bounds ? other.bounds.minZ : (other.z - (other.halfLength || 1.5));
+        const otherMax = other.bounds ? other.bounds.maxZ : (other.z + (other.halfLength || 1.5));
+        if (checkZ >= otherMin - 0.5 && checkZ <= otherMax + 0.5) {
+          blockedLanes.add(other.lane);
+        }
+      }
+
+      // If all 3 lanes would be blocked at checkZ, safely despawn the moving obstacle!
+      if (blockedLanes.size >= 3) {
+        obs.active = false;
+        this.scene.remove(obs.group);
+      }
     }
 
     const cleanupZ = playerZ + 35;
