@@ -68,10 +68,17 @@ export class UIManager {
   initAvatarPreferences() {
     const savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
     document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(card => {
+      const name = card.querySelector('.avatar-card-name');
       if (card.dataset.avatar === savedAvatar) {
         card.classList.add('active');
+        card.style.borderColor = '#ffd700';
+        card.style.background = 'linear-gradient(90deg, rgba(255, 215, 0, 0.22), rgba(255, 136, 0, 0.12))';
+        if (name) name.style.color = '#ffd700';
       } else {
         card.classList.remove('active');
+        card.style.borderColor = 'rgba(255, 215, 0, 0.28)';
+        card.style.background = 'rgba(255, 255, 255, 0.05)';
+        if (name) name.style.color = '#fff';
       }
     });
   }
@@ -128,11 +135,10 @@ export class UIManager {
     // 3D Playable Avatar Card Selection
     document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        document.querySelectorAll('#avatar-selection-grid .avatar-card').forEach(c => c.classList.remove('active'));
         const el = e.currentTarget;
-        el.classList.add('active');
         const avatarId = el.dataset.avatar;
         localStorage.setItem('ganesh_selected_avatar', avatarId);
+        this.initAvatarPreferences();
         this.game?.setAvatar(avatarId);
       });
     });
