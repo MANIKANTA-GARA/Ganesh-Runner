@@ -55,10 +55,17 @@ export class UIManager {
       const canvas = document.getElementById('target-ganesha-badge-canvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const tex = characterTextures.textures.ganeshaFront;
+      const savedAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
+      const tex = (savedAvatar === 'mushika_vahana')
+        ? (characterTextures.textures.mushikaFront || characterTextures.textures.ganeshaFront)
+        : characterTextures.textures.ganeshaFront;
       if (tex && tex.image) {
         ctx.clearRect(0, 0, 48, 48);
         ctx.drawImage(tex.image, 0, 0, 48, 48);
+      }
+      const targetNameEl = document.querySelector('.target-name');
+      if (targetNameEl) {
+        targetNameEl.textContent = (savedAvatar === 'mushika_vahana') ? 'MUSHIKA' : 'GANESHA';
       }
     };
     drawBadge();
@@ -139,8 +146,21 @@ export class UIManager {
         const avatarId = el.dataset.avatar;
         localStorage.setItem('ganesh_selected_avatar', avatarId);
         this.initAvatarPreferences();
+        this.initTargetBadge();
         this.game?.setAvatar(avatarId);
       });
+    });
+
+    // Select & Run on Track Button (Direct Launch into gameplay with selected avatar)
+    document.getElementById('modal-select-play-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentAvatar = localStorage.getItem('ganesh_selected_avatar') || 'bal_ganesha';
+      this.game?.setAvatar(currentAvatar);
+      this.screens.characters?.classList.add('hidden');
+      if (this.screens.startScreen && !this.screens.startScreen.classList.contains('hidden')) {
+        this.screens.startScreen.classList.add('hidden');
+      }
+      this.game?.startRun();
     });
 
     document.getElementById('menu-settings-btn')?.addEventListener('click', (e) => {
