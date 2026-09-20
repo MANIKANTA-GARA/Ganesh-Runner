@@ -344,11 +344,14 @@ export class CollectibleManager {
       item.mesh.rotation.y += delta * item.rotSpeed;
       item.mesh.position.y = item.y + Math.sin(Date.now() * 0.004 + item.z) * 0.12;
 
-      // Magnetic attraction to Ganesha
+      // Magnetic attraction to Ganesha (Tight radius, only when magnet explicitly active)
       if (isMagnetActive && playerPos) {
-        const distToPlayer = item.mesh.position.distanceTo(playerPos);
-        if (distToPlayer < 18.0) {
-          item.mesh.position.lerp(playerPos, delta * 10.0);
+        const dx = playerPos.x - item.mesh.position.x;
+        const dz = playerPos.z - item.mesh.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        // Only pull laddus that are very close in front (within 4.5m)
+        if (dist < 4.5 && dz > 0) {
+          item.mesh.position.lerp(playerPos, delta * 8.0);
           item.x = item.mesh.position.x;
           item.z = item.mesh.position.z;
         }
@@ -363,18 +366,29 @@ export class CollectibleManager {
 
   checkCollection(playerPos) {
     const collected = [];
-    const collectRadius = 1.4;
 
     for (let i = 0; i < this.collectibles.length; i++) {
       const item = this.collectibles[i];
       if (!item.active) continue;
 
-      const dx = playerPos.x - item.mesh.position.x;
-      const dy = playerPos.y - item.mesh.position.y;
-      const dz = playerPos.z - item.mesh.position.z;
-      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      // 1. Lateral lane check: Ganesha must actually be in the same track lane (tracks at X = -3, 0, 3)
+      const dx = Math.abs(playerPos.x - item.mesh.position.x);
+      if (dx > 0.85) continue;
 
-      if (dist < collectRadius) {
+      // 2. Vertical height check: Laddu must be within Ganesha's body / jumping height reach
+      const itemY = item.mesh.position.y;
+      const playerY = playerPos.y;
+      if (itemY < playerY - 0.3 || itemY > playerY + 2.5) continue;
+
+      // 3. Physical arrival along track (Z axis):
+      // In Three.js, Ganesha runs towards negative Z.
+      // playerPos.z is Ganesha's position.
+      // dz = playerPos.z - item.mesh.position.z.
+      // Before Ganesha arrives: playerPos.z > item.mesh.position.z (dz is positive).
+      // Ganesha physically arrives at the laddu when Ganesha's body actually touches it:
+      // Collect ONLY when Ganesha is right on the laddu (-0.45m to +0.65m), NOT from meters away!
+      const dz = playerPos.z - item.mesh.position.z;
+      if (dz >= -0.45 && dz <= 0.65) {
         item.active = false;
         collected.push(item.type);
 
