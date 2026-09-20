@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ganesh Run — Tools, Libraries, Frameworks & Assets</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1a1a2e;
+      background-color: #ffffff;
+      line-height: 1.35;
+      font-size: 9.5pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, #120e18 0%, #241434 50%, #4a1942 100%);
+      color: #ffffff;
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1.5px solid #d4af37;
+    }
+
+    .game-title {
+      font-family: 'Cinzel Decorative', Georgia, serif;
+      font-size: 20pt;
+      font-weight: 900;
+      color: #ffd700;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+      text-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #ff9100;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 8pt;
+      color: #e2d9f3;
+      border-top: 1px solid rgba(212, 175, 55, 0.4);
+      padding-top: 6px;
+    }
+
+    .meta-item strong {
+      color: #ffd700;
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5pt;
+      font-weight: 800;
+      color: #241434;
+      border-bottom: 1.5px solid #d4af37;
+      padding-bottom: 3px;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      page-break-after: avoid;
+    }
+
+    .section-icon {
+      font-size: 11.5pt;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      background: #fcfaff;
+      border: 1px solid #e5dcf2;
+      border-left: 3.5px solid #7928ca;
+      border-radius: 6px;
+      padding: 7px 10px;
+      page-break-inside: avoid;
+    }
+
+    .card.purple-border { border-left-color: #7928ca; }
+    .card.gold-border { border-left-color: #d4af37; }
+    .card.orange-border { border-left-color: #ff6b00; }
+    .card.blue-border { border-left-color: #0070f3; }
+    .card.green-border { border-left-color: #00c853; }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 9pt;
+      color: #120e18;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 6.5pt;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-primary { background: #7928ca; color: #fff; }
+    .badge-gold { background: #ffd700; color: #120e18; }
+    .badge-blue { background: #0070f3; color: #fff; }
+    .badge-green { background: #00c853; color: #fff; }
+
+    .card-desc {
+      font-size: 8pt;
+      color: #555566;
+      line-height: 1.3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px 0;
+      font-size: 8pt;
+      page-break-inside: avoid;
+    }
+
+    th {
+      background-color: #241434;
+      color: #ffffff;
+      text-align: left;
+      padding: 5px 8px;
+      font-weight: 700;
+      font-size: 8pt;
+    }
+
+    th:first-child { border-top-left-radius: 4px; }
+    th:last-child { border-top-right-radius: 4px; }
+
+    td {
+      padding: 4.5px 8px;
+      border-bottom: 1px solid #eae3f4;
+      color: #222233;
+      line-height: 1.25;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fcfaff;
+    }
+
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5pt;
+      color: #b8005b;
+      background: #fdf2f7;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      padding-top: 8px;
+      border-top: 1px solid #d4af37;
+      text-align: center;
+      font-size: 7.5pt;
+      color: #666677;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <!-- HEADER BANNER -->
+  <div class="header-banner">
+    <div class="game-title">GANESH RUN</div>
+    <div class="subtitle">The Great Laddu Chase — Complete Tools & Technical Specification</div>
+    <div class="meta-bar">
+      <div class="meta-item"><strong>Developer:</strong> Manikanta Gara (NIAT x NSRIT)</div>
+      <div class="meta-item"><strong>3D Engine:</strong> Three.js (WebGL 2.0)</div>
+      <div class="meta-item"><strong>Performance:</strong> 60 FPS Locked</div>
+      <div class="meta-item"><strong>Production URL:</strong> https://ganesh-runner.vercel.app</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: CORE FRAMEWORKS & RUNTIMES -->
+  <h2><span class="section-icon">🛠️</span> 1. Core Frameworks, Runtimes & Build System</h2>
+  <div class="grid-2">
+    <div class="card purple-border">
+      <div class="card-title">
+        <span>Vite Bundler & Dev Server</span>
+        <span class="badge badge-primary">v6.4.3</span>
+      </div>
+      <div class="card-desc">
+        Modern frontend build tool utilizing Rollup under the hood. Provides instant Hot Module Replacement (HMR) and compiles production assets into a minified, high-performance static distribution bundle.
+      </div>
+    </div>
+
+    <div class="card gold-border">
+      <div class="card-title">
+        <span>Node.js Runtime</span>
+        <span class="badge badge-gold">v20.x / v24.x</span>
+      </div>
+      <div class="card-desc">
+        Underlying execution engine for build pipelines, continuous integration, headless deployment orchestration, and mathematical invariant simulation testing (32,400m test runs).
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: PRODUCTION PACKAGES -->
+  <h2><span class="section-icon">📚</span> 2. Production Libraries & Dependencies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Library</th>
+        <th style="width: 14%;">Version</th>
+        <th style="width: 26%;">Category</th>
+        <th style="width: 40%;">Role in Ganesh Run</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Three.js</strong></td>
+        <td><span class="code-font">^0.186.0</span></td>
+        <td>3D WebGL Graphics Engine</td>
+        <td>Renders the entire 3-track railway scene, 3D trains, animated characters, dynamic shadows, volumetric Xenon headlight beams, and tracking camera.</td>
+      </tr>
+      <tr>
+        <td><strong>canvas-confetti</strong></td>
+        <td><span class="code-font">^1.9.4</span></td>
+        <td>Particle FX System</td>
+        <td>High-performance GPU-accelerated confetti celebration triggered on high scores, level milestones, and game over screens.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3: NATIVE WEB APIS -->
+  <h2><span class="section-icon">🌐</span> 3. Native Web Platform APIs (Zero-Dependency Engine)</h2>
+  <div class="grid-3">
+    <div class="card blue-border">
+      <div class="card-title">
+        <span>WebGL 2.0</span>
+        <span class="badge badge-blue">GPU</span>
+      </div>
+      <div class="card-desc">
+        Hardware-accelerated GPU pipeline delivering locked 60 FPS graphics across smartphones, tablets, and desktop browsers.
+      </div>
+    </div>
+
+    <div class="card green-border">
+      <div class="card-title">
+        <span>Web Audio API</span>
+        <span class="badge badge-green">Synth</span>
+      </div>
+      <div class="card-desc">
+        Procedural sound synthesis: Raga Bhoopali melodies, Tanpura drones, Dholak percussion, and dual-tone train horns without external MP3 files.
+      </div>
+    </div>
+
+    <div class="card gold-border">
+      <div class="card-title">
+        <span>Touch Gestures</span>
+        <span class="badge badge-gold">Mobile</span>
+      </div>
+      <div class="card-desc">
+        Low-latency swipe gesture detector capturing touchstart, touchmove, and touchend vectors for dodging, jumping, and sliding.
+      </div>
+    </div>
+
+    <div class="card purple-border">
+      <div class="card-title">
+        <span>HTML5 Canvas 2D</span>
+        <span class="badge badge-primary">2D Context</span>
+      </div>
+      <div class="card-desc">
+        Powers procedural texture synthesis in RealisticCharacterTextures.js, creating ballast gravel, WAP-7 liveries, and hazard stripes.
+      </div>
+    </div>
+
+    <div class="card blue-border">
+      <div class="card-title">
+        <span>Web Storage</span>
+        <span class="badge badge-blue">localStorage</span>
+      </div>
+      <div class="card-desc">
+        Persists lifetime high scores, distance records, total laddus, and selected Avatar preference across browser sessions.
+      </div>
+    </div>
+
+    <div class="card orange-border">
+      <div class="card-title">
+        <span>Import Maps</span>
+        <span class="badge badge-gold">W3C Standard</span>
+      </div>
+      <div class="card-desc">
+        Native module resolution for Three.js, guaranteeing fail-safe execution even if raw unbundled source files are loaded.
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- PAGE 2 -->
+  <!-- SECTION 4: ASSETS INVENTORY -->
+  <h2><span class="section-icon">🎨</span> 4. Graphical & Visual Assets Inventory (<span class="code-font">public/assets/</span>)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 32%;">Asset Filename</th>
+        <th style="width: 14%;">Size</th>
+        <th style="width: 18%;">Format</th>
+        <th style="width: 36%;">Role in Ganesh Run</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>bal_ganesha_preview.png</strong></td>
+        <td>843.7 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Preview photo card for Bal Ganesha in the Avatars modal.</td>
+      </tr>
+      <tr>
+        <td><strong>ganesha_front_run.png</strong></td>
+        <td>843.7 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Front-facing 3D render of Lord Ganesha for Main Menu & Pause screens.</td>
+      </tr>
+      <tr>
+        <td><strong>ganesha_back_run.png</strong></td>
+        <td>898.7 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Dynamic rear running sprite of Bal Ganesha for active track gameplay.</td>
+      </tr>
+      <tr>
+        <td><strong>mushika_preview.png</strong></td>
+        <td>185.0 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>3/4 isometric preview photo for the "Ganesha on Mushika" avatar card.</td>
+      </tr>
+      <tr>
+        <td><strong>mushika_front.png</strong></td>
+        <td>176.1 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Front 3D render of Ganesha seated on Mount Mushika granting abhaya mudra.</td>
+      </tr>
+      <tr>
+        <td><strong>mushika_back.png</strong></td>
+        <td>147.9 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Rear dynamic running sprite of Ganesha riding Mushika on the track.</td>
+      </tr>
+      <tr>
+        <td><strong>mushika_vahana_sheet.png</strong></td>
+        <td>792.8 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>Multi-angle stride texture sheet for Mount Mushika's galloping animation.</td>
+      </tr>
+      <tr>
+        <td><strong>shiva_back_run.png</strong></td>
+        <td>792.4 KB</td>
+        <td>PNG (Alpha)</td>
+        <td>High-res running sprite of Lord Shiva holding Trishul chasing Ganesha.</td>
+      </tr>
+      <tr>
+        <td><strong>ref_front.jpg & ref_back.jpg</strong></td>
+        <td>1,014 KB</td>
+        <td>JPEG</td>
+        <td>Master source photorealistic character reference renders.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 5: PROCEDURAL 3D MODELS -->
+  <h2><span class="section-icon">🚆</span> 5. Procedural 3D Models & Corridor Engine</h2>
+  <div class="grid-2">
+    <div class="card blue-border">
+      <div class="card-title">
+        <span>Indian Railways WAP-7 Locomotive</span>
+        <span class="badge badge-blue">Procedural 3D</span>
+      </div>
+      <div class="card-desc">
+        8.8m electric locomotive with authentic Indian Railways blue livery, chevron hazard striping, pantographs, bogies, cast steel wheels, and Xenon headlight beams.
+      </div>
+    </div>
+
+    <div class="card gold-border">
+      <div class="card-title">
+        <span>ICF / LHB Passenger Coaches</span>
+        <span class="badge badge-gold">Procedural 3D</span>
+      </div>
+      <div class="card-desc">
+        9.2m passenger coaches with corrugated steel roofs, double bogies, rubber gangway bellows, and rear glowing red safety tail-lights.
+      </div>
+    </div>
+
+    <div class="card green-border">
+      <div class="card-title">
+        <span>Auto-Rickshaws & Tempos</span>
+        <span class="badge badge-green">City Obstacles</span>
+      </div>
+      <div class="card-desc">
+        Vivid Kelly green & sunshine yellow auto-rickshaws (tuk-tuks) and delivery tempos with safety bumpers and rooftop taxi indicator lights.
+      </div>
+    </div>
+
+    <div class="card orange-border">
+      <div class="card-title">
+        <span>Guaranteed Open Track Corridors</span>
+        <span class="badge badge-gold">Clearance Rule</span>
+      </div>
+      <div class="card-desc">
+        Strict mathematical invariant: maximum 2 stationary trains per wave, leaving exactly 1 track 100% open with a trail of 6 glowing Motichoor Laddus.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: TYPOGRAPHY & DEVOPS -->
+  <h2><span class="section-icon">🔤</span> 6. Typography & UI Design Tokens</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Font Family</th>
+        <th style="width: 25%;">Weights</th>
+        <th style="width: 25%;">Provider</th>
+        <th style="width: 25%;">Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Cinzel Decorative</strong></td>
+        <td>700, 900</td>
+        <td>Google Fonts</td>
+        <td>Game title ("GANESH RUN"), modal headers, victory badges.</td>
+      </tr>
+      <tr>
+        <td><strong>Outfit</strong></td>
+        <td>400, 600, 700, 800</td>
+        <td>Google Fonts</td>
+        <td>Modern UI: buttons, guide bar, settings, HUD score readouts.</td>
+      </tr>
+      <tr>
+        <td><strong>JetBrains Mono</strong></td>
+        <td>400, 600</td>
+        <td>System Monospace</td>
+        <td>Score meters, distance counters, and calibrated gyro angles.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 7: DEVOPS & HOSTING -->
+  <h2><span class="section-icon">🚀</span> 7. DevOps & Cloud Hosting Infrastructure</h2>
+  <div class="grid-2">
+    <div class="card purple-border">
+      <div class="card-title">
+        <span>Vercel Edge Network</span>
+        <span class="badge badge-primary">Primary Production</span>
+      </div>
+      <div class="card-desc">
+        Hosts the Vite compiled static build at <strong>https://ganesh-runner.vercel.app</strong> with global CDN routing and automatic Gzip compression.
+      </div>
+    </div>
+
+    <div class="card gold-border">
+      <div class="card-title">
+        <span>GitHub Pages & REST Deployer</span>
+        <span class="badge badge-gold">Mirror & CI/CD</span>
+      </div>
+      <div class="card-desc">
+        Automated zero-git push script syncing to <strong>MANIKANTA-GARA/Ganesh-Runner</strong> with live mirror at <strong>https://MANIKANTA-GARA.github.io/Ganesh-Runner/</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-note">
+    <strong>Ganesh Run: The Great Laddu Chase</strong> &bull; Developed by <strong>Manikanta Gara (NIAT x NSRIT)</strong> &bull; Powered by Three.js, Vite & WebGL
+  </div>
+
+</body>
+</html>
