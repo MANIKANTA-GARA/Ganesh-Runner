@@ -64,10 +64,10 @@ export class RealisticCharacterTextures {
     this.textures.ganeshaFront = this.generateProceduralGaneshaFront();
     this.textures.ganeshaBackFrames = [this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack];
     this.textures.ganeshaFrontFrames = [this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront];
-    this.textures.mushikaBack = this.textures.ganeshaBack;
-    this.textures.mushikaFront = this.textures.ganeshaFront;
-    this.textures.mushikaBackFrames = [this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack, this.textures.ganeshaBack];
-    this.textures.mushikaFrontFrames = [this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront, this.textures.ganeshaFront];
+    this.textures.mushikaBack = this.generateProceduralMushikaBack();
+    this.textures.mushikaFront = this.generateProceduralMushikaFront();
+    this.textures.mushikaBackFrames = [this.textures.mushikaBack, this.textures.mushikaBack, this.textures.mushikaBack, this.textures.mushikaBack];
+    this.textures.mushikaFrontFrames = [this.textures.mushikaFront, this.textures.mushikaFront, this.textures.mushikaFront, this.textures.mushikaFront];
     this.textures.shivaBack = this.generateProceduralShivaBack();
     this.textures.shivaFront = this.generateProceduralShivaFront();
     this.textures.shivaBackFrames = [this.textures.shivaBack, this.textures.shivaBack, this.textures.shivaBack, this.textures.shivaBack];
@@ -635,6 +635,276 @@ export class RealisticCharacterTextures {
     ctx.fillStyle = '#f8f9fa';
     ctx.beginPath();
     ctx.ellipse(256, 595, 36, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  // --- Ultra-Realistic Procedural Mushika Vahana (Lord Ganesha Riding Sacred Mouse) - Rear Running View ---
+  generateProceduralMushikaBack() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 768;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Mushika Sacred Mouse Body (Lower Half)
+    const mouseGrad = ctx.createRadialGradient(256, 490, 40, 256, 490, 180);
+    mouseGrad.addColorStop(0, '#a0abbd');
+    mouseGrad.addColorStop(0.6, '#7d8a9e');
+    mouseGrad.addColorStop(1, '#535d6d');
+    ctx.fillStyle = mouseGrad;
+
+    // Plump Sacred Mouse Rear & Haunches
+    ctx.beginPath();
+    ctx.ellipse(256, 500, 160, 130, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Mouse Ears
+    ctx.fillStyle = '#6c7a8d';
+    ctx.beginPath();
+    ctx.ellipse(140, 410, 42, 52, -0.35, 0, Math.PI * 2);
+    ctx.ellipse(372, 410, 42, 52, 0.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fca5a5';
+    ctx.beginPath();
+    ctx.ellipse(140, 410, 28, 38, -0.35, 0, Math.PI * 2);
+    ctx.ellipse(372, 410, 28, 38, 0.35, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sacred Curled Tail
+    ctx.strokeStyle = '#6c7a8d';
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(256, 580);
+    ctx.bezierCurveTo(290, 650, 390, 660, 410, 580);
+    ctx.bezierCurveTo(420, 520, 370, 500, 380, 470);
+    ctx.stroke();
+
+    // Running Paws
+    ctx.fillStyle = '#fca5a5';
+    ctx.beginPath();
+    ctx.ellipse(180, 620, 26, 18, -0.15, 0, Math.PI * 2);
+    ctx.ellipse(332, 620, 26, 18, 0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Golden Embroidered Saddle (Asana)
+    const saddleGrad = ctx.createLinearGradient(150, 400, 360, 460);
+    saddleGrad.addColorStop(0, '#ffd700');
+    saddleGrad.addColorStop(0.5, '#ffaa00');
+    saddleGrad.addColorStop(1, '#cc8800');
+    ctx.fillStyle = saddleGrad;
+    ctx.beginPath();
+    ctx.moveTo(150, 410);
+    ctx.bezierCurveTo(200, 440, 312, 440, 362, 410);
+    ctx.lineTo(375, 460);
+    ctx.bezierCurveTo(312, 495, 200, 495, 137, 460);
+    ctx.closePath();
+    ctx.fill();
+
+    // Golden Saddle Fringe & Ruby Accents
+    ctx.fillStyle = '#d90429';
+    for (let x = 160; x <= 350; x += 26) {
+      ctx.beginPath();
+      ctx.arc(x, 462, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 2. Lord Ganesha Seated Atop Mushika (Upper Half)
+    const skinGrad = ctx.createRadialGradient(256, 230, 20, 256, 230, 150);
+    skinGrad.addColorStop(0, '#ffd8b5');
+    skinGrad.addColorStop(0.6, '#f8ad80');
+    skinGrad.addColorStop(1, '#e58055');
+
+    // Ganesha Back Torso
+    ctx.fillStyle = skinGrad;
+    ctx.beginPath();
+    ctx.ellipse(256, 310, 85, 75, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Royal Yellow/Orange Dhoti & Silk Fold
+    ctx.fillStyle = '#ff8800';
+    ctx.beginPath();
+    ctx.moveTo(180, 335);
+    ctx.bezierCurveTo(210, 385, 302, 385, 332, 335);
+    ctx.lineTo(345, 415);
+    ctx.bezierCurveTo(295, 445, 217, 445, 167, 415);
+    ctx.closePath();
+    ctx.fill();
+
+    // Golden Crown & Head from behind
+    ctx.fillStyle = skinGrad;
+    ctx.beginPath();
+    ctx.arc(256, 205, 68, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Elephant Ears
+    ctx.beginPath();
+    ctx.ellipse(165, 205, 55, 42, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(347, 205, 55, 42, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Golden Mukut (Crown)
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.moveTo(256, 60);
+    ctx.lineTo(305, 175);
+    ctx.lineTo(207, 175);
+    ctx.closePath();
+    ctx.fill();
+
+    // Crown Pinnacle Kalasha
+    ctx.fillStyle = '#ffea00';
+    ctx.beginPath();
+    ctx.arc(256, 55, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Trailing Vermillion Silk Scarf
+    ctx.strokeStyle = '#d90429';
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(195, 250);
+    ctx.bezierCurveTo(140, 280, 110, 330, 95, 390);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(317, 250);
+    ctx.bezierCurveTo(372, 280, 402, 330, 417, 390);
+    ctx.stroke();
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  // --- Ultra-Realistic Procedural Mushika Vahana - Front Menu View ---
+  generateProceduralMushikaFront() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 768;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Mushika Sacred Mouse Front Body
+    const mouseGrad = ctx.createRadialGradient(256, 520, 30, 256, 520, 160);
+    mouseGrad.addColorStop(0, '#b0bac9');
+    mouseGrad.addColorStop(0.6, '#7d8a9e');
+    mouseGrad.addColorStop(1, '#535d6d');
+    ctx.fillStyle = mouseGrad;
+
+    ctx.beginPath();
+    ctx.ellipse(256, 520, 140, 110, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Snout & Nose
+    ctx.fillStyle = '#fca5a5';
+    ctx.beginPath();
+    ctx.ellipse(256, 560, 28, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#3e2723';
+    ctx.beginPath();
+    ctx.arc(256, 554, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cute Mouse Whiskers
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(230, 560); ctx.lineTo(160, 550);
+    ctx.moveTo(230, 565); ctx.lineTo(165, 570);
+    ctx.moveTo(282, 560); ctx.lineTo(352, 550);
+    ctx.moveTo(282, 565); ctx.lineTo(347, 570);
+    ctx.stroke();
+
+    // Mouse Eyes
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(220, 515, 9, 0, Math.PI * 2);
+    ctx.arc(292, 515, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(218, 513, 3, 0, Math.PI * 2);
+    ctx.arc(290, 513, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Golden Ghungroo (Bell Collar)
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(256, 480, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#cc8800';
+    ctx.beginPath();
+    ctx.arc(256, 484, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Lord Ganesha Seated in Blessing Front View
+    const skinGrad = ctx.createRadialGradient(256, 260, 25, 256, 260, 160);
+    skinGrad.addColorStop(0, '#ffd8b5');
+    skinGrad.addColorStop(0.6, '#f8ad80');
+    skinGrad.addColorStop(1, '#e58055');
+
+    // Head
+    ctx.fillStyle = skinGrad;
+    ctx.beginPath();
+    ctx.arc(256, 240, 78, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears
+    ctx.beginPath();
+    ctx.ellipse(160, 240, 60, 48, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(352, 240, 60, 48, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fca5a5';
+    ctx.beginPath();
+    ctx.ellipse(160, 240, 40, 32, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(352, 240, 40, 32, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Big Peaceful Eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(215, 225, 16, 20, 0, 0, Math.PI * 2);
+    ctx.ellipse(297, 225, 16, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#3e2723';
+    ctx.beginPath();
+    ctx.arc(218, 225, 10, 0, Math.PI * 2);
+    ctx.arc(294, 225, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Curved Trunk with Sweet Modak
+    ctx.fillStyle = skinGrad;
+    ctx.beginPath();
+    ctx.moveTo(238, 255);
+    ctx.bezierCurveTo(230, 330, 280, 360, 305, 345);
+    ctx.bezierCurveTo(325, 330, 305, 300, 275, 310);
+    ctx.bezierCurveTo(268, 290, 270, 255, 274, 255);
+    ctx.closePath();
+    ctx.fill();
+
+    // Golden Modak in Left Hand
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath();
+    ctx.moveTo(330, 340);
+    ctx.lineTo(345, 320);
+    ctx.lineTo(360, 340);
+    ctx.closePath();
+    ctx.fill();
+
+    // Tilak & Sacred Om
+    ctx.fillStyle = '#d90429';
+    ctx.font = 'bold 22px "Segoe UI Symbol", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ॐ', 265, 315);
+
+    // Golden Mukut
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.moveTo(256, 50);
+    ctx.lineTo(325, 180);
+    ctx.lineTo(187, 180);
+    ctx.closePath();
     ctx.fill();
 
     const tex = new THREE.CanvasTexture(canvas);
